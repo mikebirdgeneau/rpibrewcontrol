@@ -7,20 +7,19 @@
 
 ### How do I get set up? ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+In order to get started, there are a couple steps you need to perform:
 
-### Contribution guidelines ###
+Install package dependencies & required modules:
+```
+chmod +x install_requirements.sh
+./install_requirements.sh
+```
 
-* Writing tests
-* Code review
-* Other guidelines
+Add your pushbullet key by copying secrets.yml.template to secrets.yml and editing it to include your access key:
+```
+cd rpiBrewControl
+cp secrets.yml.template secrets.yml
+vim secrets.yml 
+```
 
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+If you're working in the adafruit webIDE for development, then when you clone, you should strongly consider checking the box to not update the remote repository... this should keep it linked to this repo.
