@@ -42,7 +42,7 @@ initializeGPIO(config)
        
 # Poll Temperature Sensors
 print datetime.datetime.utcnow()
-for sensor in config['sensors']:
+for sensor in sensors:
     curTemp = tempData1Wire(sensor['id'])
     if(add_temp_reading(conn,datetime.datetime.utcnow(),sensor['id'],curTemp)==0):
         print sensor['id'] + ": " + "{:10.3f}".format(curTemp) + "C"
