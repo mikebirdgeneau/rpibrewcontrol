@@ -27,7 +27,7 @@ config = yaml.load(file("config.yml"))
 secrets = yaml.load(file("secrets.yml"))
 
 # Initialize Notifications
-if config['usePushbullet'] == "true"
+if config['usePushbullet'] == "true":
     pb = Pushbullet(secrets['pushbulletAPIKey'])
     push = pb.push_note("Initializing RasPiBrew", "The Brew Control has been initialized")
 
