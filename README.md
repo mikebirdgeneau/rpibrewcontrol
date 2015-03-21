@@ -2,7 +2,7 @@
 
 ### What is this repository for? ###
 
-* Quick summary
+* Temperature Control & Logging for Brewing using the RaspberryPi
 * Version 0.1a (Early Development)
 
 ### How do I get set up? ###
