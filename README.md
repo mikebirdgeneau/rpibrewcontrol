@@ -15,7 +15,7 @@ chmod +x install_requirements.sh
 ./install_requirements.sh
 ```
 
-Add your pushbullet key by copying secrets.yml.template to secrets.yml and editing it to include your access key:
+Add your pushbullet key by copying `secrets.yml.template` to `secrets.yml` and editing it to include your access key:
 ```
 cd rpiBrewControl
 cp secrets.yml.template secrets.yml
