@@ -24,6 +24,7 @@ signal.signal(signal.SIGINT, signal_handler)
 
 # Load configuration
 config = yaml.load(file("config.yml"))
+secret = yaml.load(file("secrets.yml"))
 
 # Initialize Notifications
 pb = Pushbullet(config['pushbulletAPIKey'])
