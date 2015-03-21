@@ -5,7 +5,7 @@ tempUnit:    C
 dbFile:      rpiBrewData.db
 keepRows:    432000
 
-usePushbullet: true
+usePushbullet: false
 
 refreshConfig: 5.0
 
