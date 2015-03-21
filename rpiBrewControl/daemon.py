@@ -24,10 +24,10 @@ signal.signal(signal.SIGINT, signal_handler)
 
 # Load configuration
 config = yaml.load(file("config.yml"))
-secret = yaml.load(file("secrets.yml"))
+secrets = yaml.load(file("secrets.yml"))
 
 # Initialize Notifications
-pb = Pushbullet(config['pushbulletAPIKey'])
+pb = Pushbullet(secrets['pushbulletAPIKey'])
 push = pb.push_note("Initializing RasPiBrew", "The Brew Control has been initialized", contact=pb.contacts[0])
 
 # Load Configuration into Sensor Classes
