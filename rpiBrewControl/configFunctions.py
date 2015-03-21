@@ -35,4 +35,6 @@ def loadSensorConfig(config):
     return(sensors)
     
 def updateSensorConfig(config,sensors):
+    # TODO: Load configuration files, and update settings that have changed.
+    # Should not update the setpoint though!
     return(sensors)
