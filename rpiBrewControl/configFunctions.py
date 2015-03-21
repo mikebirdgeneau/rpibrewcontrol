@@ -19,8 +19,6 @@ class sensorSettings:
         self.Td = Td
         self.Ts = Ts
         self.num_pnts_smooth = num_pnts_smooth
-    def __getitem__(self, i):
-...     return self[i]
         
 # Load Configuration into Sensor Classes
 def loadSensorConfig(config):
