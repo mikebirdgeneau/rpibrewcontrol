@@ -28,7 +28,7 @@ secrets = yaml.load(file("secrets.yml"))
 
 # Initialize Notifications
 pb = Pushbullet(secrets['pushbulletAPIKey'])
-push = pb.push_note("Initializing RasPiBrew", "The Brew Control has been initialized", contact=pb.contacts[0])
+push = pb.push_note("Initializing RasPiBrew", "The Brew Control has been initialized")
 
 # Load Configuration into Sensor Classes
 sensors = loadSensorConfig(config)
