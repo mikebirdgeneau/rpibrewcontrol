@@ -42,7 +42,7 @@ initializeGPIO(config)
        
        
 # Poll Temperature Sensors
-print datetime.datetime.utcnow()
+print datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M")
 for sensor in sensors:
     curTemp = tempData1Wire(sensor.id)
     if(add_temp_reading(conn,datetime.datetime.utcnow(),sensor.id,curTemp)==0):
