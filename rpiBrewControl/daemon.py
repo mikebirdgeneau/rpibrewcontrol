@@ -2,7 +2,7 @@
 
 
 # Load modules
-import os
+import time, os
 import yaml
 import sqlite3
 import datetime
@@ -41,14 +41,27 @@ conn = sqlite3.connect(config['dbFile'])
 initializeGPIO(config)
        
        
-# Poll Temperature Sensors
-print datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M")
-for sensor in sensors:
-    curTemp = tempData1Wire(sensor.id)
-    if(add_temp_reading(conn,datetime.datetime.utcnow(),sensor.id,curTemp)==0):
-        print sensor.id + ": " + "{:10.3f}".format(curTemp) + "C"
+# Setup Processes: Main, Temperature, Heating
+p = current_process()
+print 'Starting:', p.name, p.pid
+        
+# Start Temperature Process
+parent_conn_temp, child_conn_temp = Pipe()       
+ptemp = Process(name = "gettempProc", target=gettempProc, args=(child_conn_temp, sensors))
+ptemp.daemon = True
+ptemp.start() 
 
-# Read Current Temperatures, break into subprocesses / threads?
+# Start PID / Heating Process
+# TODO
+
+
+# Run Loop to poll results from Temperature / Heating Process.
+while (True):
+            readytemp = False
+            while parent_conn_temp.poll(): #Poll Get Temperature Process Pipe
+                temp_C, sensorID, elapsed = parent_conn_temp.recv() #non blocking receive from Get Temperature Process
+                print sensorID + ": " + "{:10.3f}".format(temp_C) + "C, elapsed:" + elapsed
+
 # Temperature set-point as a function of time, incl. DB functions.
 # PID control loop
 # Perform auto tuning (optional)?
