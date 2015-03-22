@@ -8,7 +8,7 @@ def add_temp_reading(conn,curTime,id,temp):
         conn.commit()
         return 0
     else:
-        #print id + ": Invalid reading, check if sensor is connected."
+        print id + ": Invalid reading, check if sensor is connected."
         return 1
         
 def get_temp_data_for_sensor(conn,id,limitTime = datetime.datetime.utcnow()-datetime.timedelta(hours=12)):
@@ -42,3 +42,10 @@ def get_setpoint_for_sensor(conn,id):
     rows = curs.fetchall()
     return rows
     
+    
+def add_duty_reading(conn,curTime,id,duty_cycle,set_point):
+    curs = conn.cursor()
+    curs.execute("CREATE TABLE IF NOT EXISTS duty (time datetime, id text, duty real, setpoint real)")
+    curs.execute("INSERT INTO duty values(datetime(?),(?),(?),(?))", (curTime,id,duty_cycle,set_point))
+    conn.commit()
+    return 0
