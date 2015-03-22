@@ -24,7 +24,7 @@ thread.start_new_thread(runserver, ())
 #print "opening browser"
 
 #import webbrowser  
-#url = 'http://127.0.0.1:8000/cgi/myCGI.py'
+#url = 'http://127.0.0.1:8000/index.html'
 #webbrowser.open_new(url)
 
 quit = 'n'
