@@ -44,23 +44,40 @@ initializeGPIO(config)
 # Setup Processes: Main, Temperature, Heating
 p = current_process()
 print 'Starting:', p.name, p.pid
-        
-# Start Temperature Process
-parent_conn_temp, child_conn_temp = Pipe()       
-ptemp = Process(name = "gettempProc", target=gettempProc, args=(child_conn_temp, sensors))
-ptemp.daemon = True
-ptemp.start() 
 
-# Start PID / Heating Process
-# TODO
+# Main Temperature Control Process
+def tempControlProc(sensor):
+    
+    #Pipe to communicate with "Get Temperature Process"
+    parent_conn_temp, child_conn_temp = Pipe()       
+    ptemp = Process(name = "gettempProc", target=gettempProc, args=(child_conn_temp, sensor))
+    ptemp.daemon = True
+    ptemp.start() 
+    
+    #Pipe to communicate with "Heat Process"
+    parent_conn_heat, child_conn_heat = Pipe()
+    pheat = Process(name = "heatProcGPIO", target=heatProcGPIO, args=(child_conn_heat,sensor))
+    pheat.daemon = True
+    pheat.start() 
+    
+    while (True):
+    # Temperature Poll
+        readytemp = False
+        while parent_conn_temp.poll(): #Poll Get Temperature Process Pipe
+            temp_C, sensorID, elapsed = parent_conn_temp.recv() #non blocking receive from Get Temperature Process
+            print sensorID + ": " + "{:10.3f}".format(temp_C) + "C, elapsed:" + elapsed
+    
+    # Temperature Control (PID)
+    
+    # Heat Poll
+
+# Set-up Temperature Control Process for each sensor:
+for sensor in sensors:
+    tempControlProc(sensor)
 
 
-# Run Loop to poll results from Temperature / Heating Process.
-while (True):
-            readytemp = False
-            while parent_conn_temp.poll(): #Poll Get Temperature Process Pipe
-                temp_C, sensorID, elapsed = parent_conn_temp.recv() #non blocking receive from Get Temperature Process
-                print sensorID + ": " + "{:10.3f}".format(temp_C) + "C, elapsed:" + elapsed
+
+
 
 # Temperature set-point as a function of time, incl. DB functions.
 # PID control loop
