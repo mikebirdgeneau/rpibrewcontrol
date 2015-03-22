@@ -1,4 +1,4 @@
-# README #
+# Raspberry Pi PID Temperature Control #
 
 ### What is this repository for? ###
 
