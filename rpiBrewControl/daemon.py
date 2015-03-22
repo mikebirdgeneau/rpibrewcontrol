@@ -23,6 +23,7 @@ from notificationFunctions import *
 signal.signal(signal.SIGINT, signal_handler)
 
 # Load configuration
+global config
 config = yaml.load(file("config.yml"))
 secrets = yaml.load(file("secrets.yml"))
 
@@ -69,10 +70,18 @@ def tempControlProc(sensor, proc):
         readytemp = False
         while parent_conn_temp.poll(): #Poll Get Temperature Process Pipe
             temp_C, sensorID, elapsed = parent_conn_temp.recv() #non blocking receive from Get Temperature Process
-            print sensorID + ": " + "{:10.3f}".format(temp_C) + "C, elapsed:" + elapsed
+            # Write temperature to DB
+            if temp_C != -99:
+                sensor.temp_C = temp_C
+                sensor.elapsed = elapsed
+                conn = sqlite3.connect(config['dbFile'])
+                add_temp_reading(conn,datetime.datetime.utcnow(),sensorID,temp_C)
+                conn.close()
+                print sensor.id + ": " + "{:10.3f}".format(sensor.temp_C) + "C, Setpoint: " + "{:10.3f}".format(sensor.set_point) + "C, elapsed:" + sensor.elapsed + ", duty: " + "{:10.1f}".format(sensor.duty_cycle)
+        
             
             if temp_C == -99:
-                print "Bad Temp Reading - retry"
+                #print sensorID + ": --" + "C, elapsed: " + elapsed
                 continue
 
             if (config['tempUnits'] == 'F'):
@@ -115,8 +124,14 @@ def tempControlProc(sensor, proc):
         while parent_conn_heat.poll(): #Poll Heat Process Pipe
                 sensor.cycle_time, sensor.duty_cycle = parent_conn_heat.recv() #non blocking receive from Heat Process ")
                 
+                conn = sqlite3.connect(config['dbFile'])
+                add_duty_reading(conn,datetime.datetime.utcnow(),sensor.id,sensor.duty_cycle,sensor.set_point)
+                conn.close()
+                
         pid = PIDController.pidpy(sensor.cycle_time, sensor.Kc, sensor.Ti, sensor.Td) #init pid
         readyPIDcalc = True
+        
+
     
     # Temperature set-point as a function of time, incl. DB functions.
     

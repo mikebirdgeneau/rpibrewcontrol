@@ -1,6 +1,6 @@
 
 name:        The Establishment
-tempUnit:    C
+tempUnits:   C
 
 dbFile:      rpiBrewData.db
 keepRows:    432000
@@ -14,7 +14,8 @@ sensors:
       name:             MLT
       heatPin:          17
       heaterEnabled:    1
-      defaultSetpoint:  0.0
+      defaultSetpoint:  22.0
+      dutyCycle:        0.0
       alarmLL:          -0.1
       alarmHH:          100.0
       alarmTolL:        5.0
@@ -22,7 +23,7 @@ sensors:
       Kc:               44
       Ti:               165
       Td:               4.0
-      Ts:               5.0
+      Ts:               2.0
       smoothPts:        5
     
     - id:               28-00043eb000ff
@@ -30,6 +31,7 @@ sensors:
       heatPin:          23
       heaterEnabled:    1
       defaultSetpoint:  0.0
+      dutyCycle:        0.0
       alarmLL:          -0.1
       alarmHH:          100.0
       alarmTolL:        5.0
@@ -37,7 +39,7 @@ sensors:
       Kc:               44
       Ti:               165
       Td:               4.0
-      Ts:               5.0
+      Ts:               2.0
       smoothPts:        5
 
 extraGPIO:
