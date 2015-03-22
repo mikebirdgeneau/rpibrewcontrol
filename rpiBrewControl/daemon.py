@@ -78,7 +78,7 @@ def tempControlProc(sensor):
     #Trigger notifications (iPhone, etc.) for Alarms.
 
 
-# Set-up Temperature Control Process for each sensor:
+# Set-up Temperature Control Process for each sensor by calling tempControlProc:
 for sensor in sensors:
     tempControlProc(sensor)
 
