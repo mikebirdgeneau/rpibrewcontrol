@@ -3,11 +3,17 @@
 import cgitb; cgitb.enable()
 import cgi
 import os
+import sys
 
-from ../../dbFunctions import *
-from ../../configFunctions import *
+os.chdir("../../")
+sys.path.append(os.getcwd())
+
+print "Content-Type: text/html\n"
+print os.getcwd()
+
+from dbFunctions import *
+from configFunctions import *
 
 input_data  = cgi.FieldStorage()
 #if input_data:
-print "Content-Type: text/html\n"
 print "hello"
