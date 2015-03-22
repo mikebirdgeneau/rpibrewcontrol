@@ -28,7 +28,6 @@ quit = 'n'
 while not(quit=='quit'):
     quit = raw_input('\n ***Type "quit" and hit return to exit myPyServer.*** \n\n') 
 
-
 print "myPyServer will now exit."
 
 sys.exit(0)    
