@@ -72,9 +72,8 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li class="active"><a href="#">Overview</a></li>
+            <li><a href="#temperatures">Temperatures</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -90,6 +89,16 @@
       <div class="well">
         <p id="bb"> Click the link below to load data. This will be replaced with AJAX refresh in the future. </p>
         <a href="javascript:onTest('/cgi/brewmaster.py?func=equipSummary', '')">Load Data</a>
+      </div>
+      
+      <div class="">
+        <h2>Temperatures</h2>
+        <p class="lead">Historical Temperature Trends:</p>
+      </div>
+      
+      <div class="well">
+        <p id="bb"> Click the link below to load temperature trends. </p>
+        <a href="javascript:onTest('/cgi/brewmaster.py?func=tempTrends', '')">Load Data</a>
       </div>
 
     </div><!-- /.container -->
