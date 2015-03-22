@@ -67,23 +67,20 @@ def tempControlProc(sensor):
             temp_C, sensorID, elapsed = parent_conn_temp.recv() #non blocking receive from Get Temperature Process
             print sensorID + ": " + "{:10.3f}".format(temp_C) + "C, elapsed:" + elapsed
     
-    # Temperature Control (PID)
+    # Temperature set-point as a function of time, incl. DB functions.
     
+    # Temperature Control (PID)
+
+    # Perform auto tuning (optional)?
+
     # Heat Poll
+    
+    #Trigger notifications (iPhone, etc.) for Alarms.
+
 
 # Set-up Temperature Control Process for each sensor:
 for sensor in sensors:
     tempControlProc(sensor)
-
-
-
-
-
-# Temperature set-point as a function of time, incl. DB functions.
-# PID control loop
-# Perform auto tuning (optional)?
-
-#Trigger notifications (iPhone, etc.) for Alarms.
 
 # Cleanup and release GPIO
 print "Terminating Daemon..."
