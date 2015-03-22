@@ -17,4 +17,4 @@ sudo pip install pushbullet.py
 ## Install Apache to server frontend
 sudo apt-get install apache2
 
-pip install flask-appbuilder
+sudo pip install flask-appbuilder
