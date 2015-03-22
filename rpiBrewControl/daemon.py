@@ -46,7 +46,7 @@ p = current_process()
 print 'Starting:', p.name, p.pid
 
 # Main Temperature Control Process
-def tempControlProc(sensor):
+def tempControlProc(sensor, proc):
     
     #Pipe to communicate with "Get Temperature Process"
     parent_conn_temp, child_conn_temp = Pipe()       
@@ -131,7 +131,10 @@ def tempControlProc(sensor):
 
 # Set-up Temperature Control Process for each sensor by calling tempControlProc:
 for sensor in sensors:
-    tempControlProc(sensor)
+    statusQ = Queue(2)       
+    parent_conn, child_conn = Pipe()     
+    p = Process(name = "tempControlProc", target=tempControlProc, args=(sensor,child_conn))
+    p.start()
 
 # Cleanup and release GPIO
 print "Terminating Daemon..."
