@@ -77,7 +77,7 @@ def tempControlProc(sensor, proc):
                 conn = sqlite3.connect(config['dbFile'])
                 add_temp_reading(conn,datetime.datetime.utcnow(),sensorID,temp_C)
                 conn.close()
-                print sensor.id + ": " + "{:10.3f}".format(sensor.temp_C) + "C, Setpoint: " + "{:10.3f}".format(sensor.set_point) + "C, elapsed:" + sensor.elapsed + ", duty: " + "{:10.1f}".format(sensor.duty_cycle)
+                print sensor.id + ": " + "{:7.2f}".format(sensor.temp_C) + "C, Setpoint: " + "{:7.2f}".format(sensor.set_point) + "C, elapsed: " + sensor.elapsed + ", duty: " + "{:6.0f}".format(sensor.duty_cycle)+"%"
         
             
             if temp_C == -99:

@@ -11,4 +11,10 @@ sudo python setup.py install
 cd ..
 
 sudo pip install subprocess
+sudo pip install matplotlib
 sudo pip install pushbullet.py
+
+## Install Apache to server frontend
+sudo apt-get install apache2
+
+pip install flask-appbuilder
