@@ -1,38 +1,34 @@
-# Nothing here yet!! :)
+import CGIHTTPServer
+import BaseHTTPServer
+import sys, os
 
-from flask import Flask
-import numpy as np
-import cStringIO
-import matplotlib.pyplot as plt
-import sqlite3
-from dbFunctions import *
+os.chdir("www")
+
+class Handler(CGIHTTPServer.CGIHTTPRequestHandler):
+    cgi_directories = ["/cgi"]         #make sure this is where you want it. [was "/cgi"]
+
+PORT = 8000
+
+httpd = BaseHTTPServer.HTTPServer(("", PORT), Handler)
+
+def runserver():
+    print "serving at port", PORT
+    httpd.serve_forever()
+
+import thread
+thread.start_new_thread(runserver, ())
+
+#print "opening browser"
+
+#import webbrowser  
+#url = 'http://127.0.0.1:8000/cgi/myCGI.py'
+#webbrowser.open_new(url)
+
+quit = 'n'
+while not(quit=='quit'):
+    quit = raw_input('\n ***Type "quit" and hit return to exit myPyServer.*** \n\n') 
 
 
-app = Flask(__name__)
+print "myPyServer will now exit."
 
-@app.route('/plot')
-def build_plot():
-
-  # Generate the plot
-  x = np.linspace(0, 10)
-  line, = plt.plot(x, np.sin(x))
-
-  f = cStringIO.StringIO()
-  plt.savefig(f, format='png')
-
-  # Serve up the data
-  header = {'Content-type': 'image/png'}
-  f.seek(0)
-  data = f.read()
-
-  return data, 200, header
-
-if __name__ == '__main__':
-  app.run()
-
-# Planned Functionality:
-#- Summary Table of Sensors / Status
-#- View Trends vs. Setpoints
-#- Change Setpoints
-#- Change PID settings
-#- Export Data / Charts 
+sys.exit(0)    
