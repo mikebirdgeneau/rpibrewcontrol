@@ -2,6 +2,9 @@ import CGIHTTPServer
 import BaseHTTPServer
 import sys, os
 
+os.symlink("dbFunctions.py","www/cgi/dbFunctions.py")
+os.symlink("configFunctions.py","www/cgi/configFunctions.py")
+
 os.chdir("www")
 
 class Handler(CGIHTTPServer.CGIHTTPRequestHandler):
