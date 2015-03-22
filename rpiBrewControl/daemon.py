@@ -60,6 +60,9 @@ def tempControlProc(sensor):
     pheat.daemon = True
     pheat.start() 
     
+    temp_ma_list = []
+    temp_ma = 0.0
+    
     readyPIDcalc = False
     while (True):
     # Temperature Poll
@@ -72,7 +75,7 @@ def tempControlProc(sensor):
                 print "Bad Temp Reading - retry"
                 continue
 
-            if (tempUnits == 'F'):
+            if (config['tempUnits'] == 'F'):
                 temp = (9.0/5.0)*temp_C + 32
             else:
                 temp = temp_C
@@ -81,21 +84,21 @@ def tempControlProc(sensor):
             readytemp = True
             
         if readytemp == True:
-            if mode == "auto":
+            if sensor.heaterEnabled == 1:
                 temp_ma_list.append(temp)
                 #smooth data
                 temp_ma = 0.0 #moving avg init
-                while (len(temp_ma_list) > num_pnts_smooth):
+                while (len(temp_ma_list) > sensor.smoothPts):
                     temp_ma_list.pop(0) #remove oldest elements in list
 
-                if (len(temp_ma_list) < num_pnts_smooth):
+                if (len(temp_ma_list) < sensor.smoothPts):
                     for temp_pnt in temp_ma_list:
                         temp_ma += temp_pnt
                     temp_ma /= len(temp_ma_list)
                 else: #len(temp_ma_list) == num_pnts_smooth
-                    for temp_idx in range(num_pnts_smooth):
+                    for temp_idx in range(sensor.smoothPts):
                         temp_ma += temp_ma_list[temp_idx]
-                    temp_ma /= num_pnts_smooth
+                    temp_ma /= sensor.smoothPts
 
                 #print "len(temp_ma_list) = %d" % len(temp_ma_list)
                 #print "Num Points smooth = %d" % num_pnts_smooth
@@ -104,14 +107,16 @@ def tempControlProc(sensor):
 
                 #calculate PID every cycle
                 if (readyPIDcalc == True):
-                    duty_cycle = pid.calcPID_reg4(temp_ma, set_point, True)
+                    sensor.duty_cycle = pid.calcPID_reg4(temp_ma, sensor.set_point, True)
                     #send to heat process every cycle
-                    parent_conn_heat.send([cycle_time, duty_cycle])
+                    parent_conn_heat.send([sensor.cycle_time, sensor.duty_cycle])
                     readyPIDcalc = False
                         
         while parent_conn_heat.poll(): #Poll Heat Process Pipe
-                cycle_time, duty_cycle = parent_conn_heat.recv() #non blocking receive from Heat Process ")
-                readyPIDcalc = True
+                sensor.cycle_time, sensor.duty_cycle = parent_conn_heat.recv() #non blocking receive from Heat Process ")
+                
+        pid = PIDController.pidpy(sensor.cycle_time, sensor.Kc, sensor.Ti, sensor.Td) #init pid
+        readyPIDcalc = True
     
     # Temperature set-point as a function of time, incl. DB functions.
     
