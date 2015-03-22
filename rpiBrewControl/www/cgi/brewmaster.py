@@ -15,5 +15,7 @@ from dbFunctions import *
 from configFunctions import *
 
 input_data  = cgi.FieldStorage()
-#if input_data:
-print "hello"
+if input_data['func'].value == "equipSummary":
+	print "equipment summary"
+else:
+	print "hello"
