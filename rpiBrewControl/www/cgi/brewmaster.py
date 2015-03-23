@@ -14,8 +14,19 @@ print "Content-Type: text/html\n"
 from dbFunctions import *
 from configFunctions import *
 
+global config
+config = yaml.load(file("config.yml"))
+
+# Load Configuration into Sensor Classes
+sensors = loadSensorConfig(config)
+
+# Create database connection
+conn = sqlite3.connect("../../"+config['dbFile'])
+
 input_data  = cgi.FieldStorage()
 if input_data['func'].value == "equipSummary":
-	print "Equipment Summary"
+	print "Equipment Summary: "
+	for sensor in sensors:
+		print sensor.id +": " + sensor.name
 else:
 	print "hello"
