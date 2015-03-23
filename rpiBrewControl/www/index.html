@@ -25,7 +25,7 @@
 
         <script type="text/javascript">
         <!--
-            function onTest( dest, params )
+            function onTest( dest, params, destDiv )
             {
                 var xmlhttp;
 
@@ -42,7 +42,7 @@
                 {
                     if (xmlhttp.readyState==4 && xmlhttp.status==200)
                     {
-                        document.getElementById( "bb" ).innerHTML = xmlhttp.responseText;
+                        document.getElementById( destDiv ).innerHTML = xmlhttp.responseText;
                     }
                 }
 
@@ -87,8 +87,8 @@
       </div>
 
       <div class="well">
-        <p id="bb"> Click the link below to load data. This will be replaced with AJAX refresh in the future. </p>
-        <a href="javascript:onTest('/cgi/brewmaster.py?func=equipSummary', '')">Load Data</a>
+        <p id="equipSummary"> Click the link below to load data. This will be replaced with AJAX refresh in the future. </p>
+        <a href="javascript:onTest('/cgi/brewmaster.py?func=equipSummary', '', 'equipSummary')">Load Data</a>
       </div>
       
       <div class="">
@@ -97,8 +97,8 @@
       </div>
       
       <div class="well">
-        <p id="bb"> Click the link below to load temperature trends. </p>
-        <a href="javascript:onTest('/cgi/brewmaster.py?func=tempTrends', '')">Load Data</a>
+        <p id="tempTrends"> Click the link below to load temperature trends. </p>
+        <a href="javascript:onTest('/cgi/brewmaster.py?func=tempTrends', '', 'tempTrends')">Load Data</a>
       </div>
 
     </div><!-- /.container -->
