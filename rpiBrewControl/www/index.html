@@ -84,7 +84,7 @@
         <div class="row">
             <div class="col-sm-12">
                 <h3>Equipment Summary</h3>
-                <p id="equipSummary"> Loading... </p>
+                <div id="equipSummary"><p> Loading... </p></div>
             </div>
         </div>
       
@@ -94,24 +94,27 @@
       </div>
       
       <div class="well">
-        <p id="tempTrends"> Click the link below to load temperature trends. </p>
-        <!--<a href="javascript:onTest('/cgi/brewmaster.py?func=tempTrends', '', 'tempTrends')">Load Data</a>-->
+        <div id="tempTrends"><p id="tempTrends"> Click the link below to load temperature trends. </p></div>
       </div>
 
     </div><!-- /.container -->
 
+    <script>
+        var a = 0;
+        function refreshSummary() {
+            onTest('/cgi/brewmaster.py?func=equipSummary', '', 'equipSummary');
+            onTest('/cgi/brewmaster.py?func=tempTrends', '', 'tempTrends');
+            a = a + 1;
+        }
 
+        setInterval(refreshSummary, 5000);
+    </script>
+    
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
-    <script>
-        setInterval(onTest('/cgi/brewmaster.py?func=equipSummary', '', 'equipSummary'), 5000);
-        setInterval(onTest('/cgi/brewmaster.py?func=tempTrends', '', 'tempTrends'), 10000);
-
-        
-    </script>
   </body>
 </html>
 
