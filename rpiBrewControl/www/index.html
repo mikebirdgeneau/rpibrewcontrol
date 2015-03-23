@@ -79,17 +79,14 @@
       </div>
     </nav>
 
-    <div class="container">
+    <div class="container-fluid">
 
-      <div class="">
-        <h2>Overview</h2>
-        <p class="lead">Equipment Summary:</p>
-      </div>
-
-      <div class="well">
-        <p id="equipSummary"> Click the link below to load data. This will be replaced with AJAX refresh in the future. </p>
-        <a href="javascript:onTest('/cgi/brewmaster.py?func=equipSummary', '', 'equipSummary')">Load Data</a>
-      </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Equipment Summary</h3>
+                <p id="equipSummary"> Loading... </p>
+            </div>
+        </div>
       
       <div class="">
         <h2>Temperatures</h2>
@@ -98,7 +95,7 @@
       
       <div class="well">
         <p id="tempTrends"> Click the link below to load temperature trends. </p>
-        <a href="javascript:onTest('/cgi/brewmaster.py?func=tempTrends', '', 'tempTrends')">Load Data</a>
+        <!--<a href="javascript:onTest('/cgi/brewmaster.py?func=tempTrends', '', 'tempTrends')">Load Data</a>-->
       </div>
 
     </div><!-- /.container -->
@@ -109,6 +106,12 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script>
+        setInterval(onTest('/cgi/brewmaster.py?func=equipSummary', '', 'equipSummary'), 5000);
+        setInterval(onTest('/cgi/brewmaster.py?func=tempTrends', '', 'tempTrends'), 10000);
+
+        
+    </script>
   </body>
 </html>
 
