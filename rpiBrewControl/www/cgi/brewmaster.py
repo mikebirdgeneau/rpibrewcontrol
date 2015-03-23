@@ -9,13 +9,13 @@ os.chdir("../../")
 sys.path.append(os.getcwd())
 
 print "Content-Type: text/html\n"
-print os.getcwd()
+#print os.getcwd()
 
 from dbFunctions import *
 from configFunctions import *
 
 input_data  = cgi.FieldStorage()
 if input_data['func'].value == "equipSummary":
-	print "equipment summary"
+	print "Equipment Summary"
 else:
 	print "hello"
