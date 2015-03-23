@@ -33,7 +33,7 @@ if input_data['func'].value == "equipSummary":
     print "<table class='table table-striped table-responsive'><tr><th>Name</th><th>ID</th><th>Temp (C)</th><th>Setpoint (C)</th><th>Status</th><th>Duty</th></tr>"
     
     for sensor in sensors:
-        print "<tr><td>"+sensor.name+"</td><td>"+sensor.id+"</td><td>TODO!</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>"
+        print "<tr><td><h6>"+sensor.name+"</h6></td><td><small>"+sensor.id+"</small></td><td>TODO!</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>"
     print "</table>"
     
 else:
