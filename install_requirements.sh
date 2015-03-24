@@ -11,8 +11,10 @@ sudo python setup.py install
 cd ..
 
 sudo pip install subprocess
-sudo pip install matplotlib
+#sudo pip install matplotlib
 sudo pip install pushbullet.py
+sudo pip install simplejson
+#sudo pip install python-nvd3
 
 ## Install Apache to server frontend
 sudo apt-get install apache2
