@@ -100,14 +100,15 @@
     </div><!-- /.container -->
 
     <script>
-        var a = 0;
         function refreshSummary() {
             onTest('/cgi/brewmaster.py?func=equipSummary', '', 'equipSummary');
-            onTest('/cgi/brewmaster.py?func=tempTrends', '', 'tempTrends');
-            a = a + 1;
+	}
+	function refreshTempTrends() {        
+	    onTest('/cgi/brewmaster.py?func=tempTrends', '', 'tempTrends');
         }
 
         setInterval(refreshSummary, 5000);
+        setInterval(refreshTempTrends, 10000);
     </script>
     
     <!-- Bootstrap core JavaScript
