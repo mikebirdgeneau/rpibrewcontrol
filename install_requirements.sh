@@ -17,6 +17,11 @@ sudo pip install RPi.GPIO
 sudo pip install subprocess
 sudo pip install pushbullet.py
 sudo pip install simplejson
+sudo pip install awscli
+# AWS CLI used to roll my own Dynamic DNS service
+# Not required!
+# http://willwarren.com/2014/07/03/roll-dynamic-dns-service-using-amazon-route53/
+
 
 ## Install RPi.GPIO # try using pip to install above, or use manual install as follows
 #wget http://pypi.python.org/packages/source/R/RPi.GPIO/RPi.GPIO-0.1.0.tar.gz
@@ -31,6 +36,19 @@ git clone https://github.com/svvitale/mongo4pi.git
 cd mongo4pi
 ./install.sh
 cd ..
+
+#curl -OL https://mms.mongodb.com/download/agent/automation/mongodb-mms-automation-agent-1.7.1.1023-1.linux_x86_64.tar.gz
+#tar -xvf mongodb-mms-automation-agent-1.7.1.1023-1.linux_x86_64.tar.gz
+#cd mongodb-mms-automation-agent-1.7.1.1023-1.linux_x86_64
+#vi local.config
+## MANUALLY ADD KEYS
+sudo mkdir /var/lib/mongodb-mms-automation
+sudo mkdir /var/log/mongodb-mms-automation
+sudo mkdir -p /data
+sudo chown `whoami` /var/lib/mongodb-mms-automation
+sudo chown `whoami` /var/log/mongodb-mms-automation
+sudo chown `whoami` /data
+nohup ./mongodb-mms-automation-agent --config=local.config >> /var/log/mongodb-mms-automation/automation-agent.log 2>&1 &
 
 ## Install NGINX to server frontend
 #sudo apt-get install nginx
