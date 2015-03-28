@@ -26,13 +26,14 @@ config = yaml.load(file(os.getcwd()+"/"+"config.yml"))
 sensors = loadSensorConfig(config)
 
 # Create database connection
-conn = sqlite3.connect(os.getcwd()+"/"+config['dbFile'],timeout=1)
+conn = sqlite3.connect(os.getcwd()+"/"+config['dbFile'])
+conn.execute("PRAGMA busy_timeout = 30000")
 
 input_data  = cgi.FieldStorage()
 if input_data['func'].value == "equipSummary":
     print "Content-Type: text/html\n"
 
-    print "<table class='table table-striped table-responsive'><tr><th>Name</th><th>ID</th><th>Temp (C)</th><th>Setpoint (C)</th><th>Status</th><th>Duty</th></tr>"
+    print "<table class='table table-striped table-responsive'><tr><th>Name</th><th>ID</th><th>Temp (C)</th><th>Setpoint (C)</th><th>Status</th><th>Duty (%)</th></tr>"
     c = conn.cursor()
     for sensor in sensors:
         c.execute("SELECT * FROM temperatures WHERE id = '"+sensor.id+"' ORDER BY time DESC LIMIT 1")
@@ -57,33 +58,19 @@ else:
     print "Content-Type: application/json\n"
     c = conn.cursor()
     chartNo = 0
-    for sensor in sensors:
-        chartNo = chartNo + 1
-        c.execute("SELECT time,tempC FROM temperatures WHERE id = '"+sensor.id+"' ORDER BY time DESC LIMIT 10")
-        sensor.tempC = "--"
-        colnamesTemp = [cn[0] for cn in c.description]
-        rowTemp = c.fetchall()
-        c.execute("SELECT time, duty, setpoint FROM duty WHERE id = '"+sensor.id+"' ORDER BY time DESC LIMIT 10")
-        rowStatus = c.fetchall()
-        
-        if rowTemp is not None:
-            #print "<div id='jsontest'>"+simplejson.dumps(rowStatus)+"</div>" 
-            #print "<div id='chart"+str(chartNo)+"'></div>"
-            #print "<script>"
-            #print "var chart"+str(chartNo)+" = c3.generate({"
-            #print "bindto: '#chart"+str(chartNo)+"',"
-            #print "x: 'time'"
-            #print "data: {"
-            #print "rows: "
-            print simplejson.dumps((rowTemp))
-            #print "axis: {"
-            #print "x: {"
-            #print "    type: 'timeseries',"
-            #print "    tick: {"
-            #print "       format: '%Y-%m-%d %H:%M'"
-            #print "    }"
-            #print "}"
-            #print "}});"
-            #print "</script>"
+    sensor = sensors[int(input_data['sensnum'].value)]
+    chartNo = chartNo + 1
+    c.execute("SELECT time,tempC FROM temperatures WHERE id = '"+sensor.id+"' ORDER BY time DESC LIMIT 10")
+
+    r = [dict((c.description[i][0], value) \
+               for i, value in enumerate(row)) for row in c.fetchall()]
+
+    #result = []
+    #columns = tuple( [d[0].decode('utf8') for d in c.description] )
+    #for row in c:
+    #    result.append(row)
+    #rows = c.fetchall()
+    print simplejson.dumps(r)
     
-    print "<p>TODO: Temperature Graphs\n"+datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')+"</p>"
+    #print simplejson.dumps(result)
+    #print "<p>TODO: Temperature Graphs\n"+datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')+"</p>"
