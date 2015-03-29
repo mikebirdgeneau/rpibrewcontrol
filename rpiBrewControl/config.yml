@@ -13,13 +13,14 @@ sensors:
     - id:               28-00043eb791ff
       name:             MLT
       heatPin:          17
-      heaterEnabled:    1
+      heaterMode:       0
+      sensorEnabled:    0
       defaultSetpoint:  22.0
       dutyCycle:        0.0
       alarmLL:          -0.1
       alarmHH:          100.0
-      alarmTolL:        5.0
-      alarmTolH:        5.0
+      alarmL:           5.0
+      alarmH:           5.0
       Kc:               44
       Ti:               165
       Td:               4.0
@@ -29,13 +30,14 @@ sensors:
     - id:               28-00043eb000ff
       name:             Kettle
       heatPin:          23
-      heaterEnabled:    1
+      heaterMode:       0
+      sensorEnabled:    0
       defaultSetpoint:  0.0
       dutyCycle:        0.0
       alarmLL:          -0.1
       alarmHH:          100.0
-      alarmTolL:        5.0
-      alarmTolH:        5.0
+      alarmL:           5.0
+      alarmH:           5.0
       Kc:               44
       Ti:               165
       Td:               4.0

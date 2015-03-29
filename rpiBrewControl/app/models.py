@@ -1,4 +1,4 @@
-#from core import db
+import datetime
 from app import db
 
 class Sensor(db.Model):
@@ -8,25 +8,26 @@ class Sensor(db.Model):
     heatPin = db.Column(db.Integer,unique=True)
     heaterMode = db.Column(db.Integer)
     sensorEnabled = db.Column(db.Integer)
-    setPoint = db.Column(db.Numeric(2))
-    dutyCycle = db.Column(db.Numeric(2))
-    alarmLL = db.Column(db.Numeric(2))
-    alarmHH = db.Column(db.Numeric(2))
-    alarmL = db.Column(db.Numeric(2))
-    alarmH = db.Column(db.Numeric(2)) 
-    pidKc = db.Column(db.Numeric(2)) 
-    pidTi = db.Column(db.Numeric(2))     
-    pidTd = db.Column(db.Numeric(2))
-    Ts = db.Column(db.Numeric(2))
+    setPoint = db.Column(db.Numeric(5,2))
+    dutyCycle = db.Column(db.Numeric(5,2))
+    alarmLL = db.Column(db.Numeric(5,2))
+    alarmHH = db.Column(db.Numeric(5,2))
+    alarmL = db.Column(db.Numeric(5,2))
+    alarmH = db.Column(db.Numeric(5,2)) 
+    pidKc = db.Column(db.Numeric(5,2)) 
+    pidTi = db.Column(db.Numeric(5,2))     
+    pidTd = db.Column(db.Numeric(5,2))
+    Ts = db.Column(db.Numeric(5,2))
     smoothPts = db.Column(db.Integer)
     updated = db.Column(db.DateTime(False))
     readings = db.relationship('Reading', backref='sensor', lazy='dynamic')
     setpoints = db.relationship('Setpoint', backref='sensor', lazy='dynamic')
 
     
-    def __init__(self, name, heatPin, heaterMode, sensorEnabled, setPoint, 
+    def __init__(self, sensor_id, name, heatPin, heaterMode, sensorEnabled, setPoint, 
         dutyCycle, alarmLL, alarmHH, alarmL, alarmH, pidKc, pidTi, pidTd, Ts, 
         smoothPts, updated):
+        self.sensor_id = sensor_id
         self.name = name
         self.heatPin = heatPin
         self.heaterMode = heaterMode
@@ -51,9 +52,9 @@ class Reading(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sensor_id = db.Column(db.String(16), db.ForeignKey('sensor.sensor_id'))
     time = db.Column(db.DateTime(False))
-    tempC = db.Column(db.Numeric(2))
-    setPoint = db.Column(db.Numeric(2))
-    dutyCycle = db.Column(db.Numeric(2))
+    tempC = db.Column(db.Numeric(6,3))
+    setPoint = db.Column(db.Numeric(5,2))
+    dutyCycle = db.Column(db.Numeric(5,2))
     heaterMode = db.Column(db.Integer)
 
 
@@ -64,12 +65,15 @@ class Reading(db.Model):
         self.setPoint = setPoint
         self.dutyCycle = dutyCycle
         self.heaterMode = heaterMode
+    
+    def __repr__(self):
+        return '<Reading %r>' % self.id
 
 class Setpoint(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sensor_id = db.Column(db.String(16), db.ForeignKey('sensor.sensor_id'))
     time = db.Column(db.DateTime(False))
-    setPoint = db.Column(db.Numeric(2))
+    setPoint = db.Column(db.Numeric(5,2))
 
     def __init__(self, sensor_id, time, setPoint):
         self.sensor_id = sensor_id
@@ -99,3 +103,4 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % (self.nickname)
+

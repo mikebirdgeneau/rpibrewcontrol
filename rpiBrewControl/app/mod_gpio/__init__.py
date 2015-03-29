@@ -1,7 +1,6 @@
 from subprocess import Popen, PIPE, call
 from multiprocessing import Process, Pipe, Queue, current_process
 from Queue import Full
-#from pid import pidpy as PIDController
 
 import time, os, signal, sys
 import RPi.GPIO as GPIO
@@ -10,17 +9,12 @@ global ON, OFF
 ON = 1
 OFF = 0
 
-def signal_handler(signal, frame):
-        print "\n---\nCleaning up GPIO..."
-        GPIO.cleanup()
-        print "Terminating rpiBrewControl."
-        sys.exit(0)
 
 # Initialize GPIO Settings
 def initializeGPIO(config):
     GPIO.setmode(GPIO.BCM)
     for sensor in config['sensors']:
-        if sensor['heaterEnabled'] == 1:
+        if sensor['heaterMode'] != 0:
            GPIO.setup(sensor['heatPin'],GPIO.OUT)
 
 # Retrieve temperature from DS18B20 temperature sensor
@@ -58,6 +52,7 @@ def getonofftime(cycle_time, duty_cycle):
 # Stand Alone Heat Process using GPIO
 def heatProcGPIO(proc, sensor):
     p = current_process()
+    #signal.signal(signal.SIGINT, original_sigint_handler)
     print 'Starting:', p.name, p.pid
     if sensor.heatPin > 0:
         GPIO.setup(sensor.heatPin, GPIO.OUT)
