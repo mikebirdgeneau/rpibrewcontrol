@@ -75,7 +75,7 @@ manager = flask.ext.restless.APIManager(app, flask_sqlalchemy_db=db)
 
 # Create API endpoints, which will be available at /api/<tablename> by
 # default. Allowed HTTP methods can be specified as well.
-manager.create_api(Sensor, methods=['GET', 'POST', 'PATCH'],max_results_per_page=100,collection_name='sensors')
+manager.create_api(Sensor, methods=['GET', 'POST', 'PATCH'],max_results_per_page=100,collection_name='sensors', exclude_columns=['readings'])
 manager.create_api(Reading, methods=['GET', 'POST'],max_results_per_page=100,collection_name='readings')
 manager.create_api(Setpoint, methods=['GET', 'POST', 'DELETE'],max_results_per_page=100,collection_name='setpoints')
 
@@ -204,7 +204,8 @@ def initialize():
 # use decorators to link the function to a url
 @app.route('/')
 def home():
-    return "Hello, World!"  # return a string
+    return render_template('index.html')  # render a template
+    #return "Hello, World!"  # return a string
 
 @app.route('/welcome')
 def welcome():
