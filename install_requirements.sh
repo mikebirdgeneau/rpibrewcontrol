@@ -4,19 +4,23 @@
 sudo apt-get update
 sudo apt-get upgrade
 
-# Install pip & easy install
-sudo apt-get install python-pip
-sudo easy_install -U distribute
-
-## Install python yaml module:
+# Install the stack
+apt-get install build-essential python-dev # python development files
+sudo apt-get install python-pip # python package manager
+sudo apt-get install nginx  # web server
+sudo apt-get install mariadb-server # mysql server
 sudo apt-get install python-yaml
 
-# Install python modules:
-sudo pip install tornado
+# Install python modules
+sudo easy_install -U distribute
+sudo pip install uwsgi
+
+#sudo pip install tornado
 sudo pip install RPi.GPIO
 sudo pip install subprocess
 sudo pip install pushbullet.py
 sudo pip install simplejson
+sudo pip install python-mysqldb
 sudo pip install awscli
 # AWS CLI used to roll my own Dynamic DNS service
 # Not required!
