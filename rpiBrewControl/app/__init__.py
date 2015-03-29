@@ -75,9 +75,9 @@ manager = flask.ext.restless.APIManager(app, flask_sqlalchemy_db=db)
 
 # Create API endpoints, which will be available at /api/<tablename> by
 # default. Allowed HTTP methods can be specified as well.
-manager.create_api(Sensor, methods=['GET', 'POST', 'PATCH'])
-manager.create_api(Reading, methods=['GET', 'POST'])
-manager.create_api(Setpoint, methods=['GET', 'POST', 'DELETE'])
+manager.create_api(Sensor, methods=['GET', 'POST', 'PATCH'],max_results_per_page=100,collection_name='sensors')
+manager.create_api(Reading, methods=['GET', 'POST'],max_results_per_page=100,collection_name='readings')
+manager.create_api(Setpoint, methods=['GET', 'POST', 'DELETE'],max_results_per_page=100,collection_name='setpoints')
 
 ### Application Functions ####
 
@@ -160,16 +160,6 @@ def tempControlProc(sensor, proc):
             db.session.commit()
             #print "Writing to DB."
 
-    
-    # Temperature set-point as a function of time, incl. DB functions.
-    
-    # Temperature Control (PID)
-
-    # Perform auto tuning (optional)?
-
-    # Heat Poll
-    
-    #Trigger notifications (iPhone, etc.) for Alarms.
 
 db.create_all()
 
@@ -207,12 +197,7 @@ def initialize():
         parent_conn, child_conn = Pipe()     
         p = Process(name = "tempControlProc", target=tempControlProc, args=(sensor,child_conn))
         p.start()
-    
-    #for sensor in sensors:
-        #statusQ = Queue(1)       
-        #parent_conn, child_conn = Pipe()     
-        #p = Process(name = "tempControlProc", target=tempControlProc, args=(sensor,child_conn))
-        #p.start()
+
 
 ### Run Application ###
 
