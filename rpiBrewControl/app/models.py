@@ -1,3 +1,5 @@
+#from core import db
+from app import db
 
 class Sensor(db.Model):
     id = db.Column(db.Integer,primary_key=True)

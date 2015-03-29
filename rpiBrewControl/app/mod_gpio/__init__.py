@@ -1,7 +1,7 @@
 from subprocess import Popen, PIPE, call
 from multiprocessing import Process, Pipe, Queue, current_process
 from Queue import Full
-from pid import pidpy as PIDController
+#from pid import pidpy as PIDController
 
 import time, os, signal, sys
 import RPi.GPIO as GPIO

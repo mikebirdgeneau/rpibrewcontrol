@@ -1,11 +1,13 @@
-### Import Modules ###
 
 from flask import Flask, render_template
 from flask.ext.sqlalchemy import SQLAlchemy
-import flask.ext.restless
+from flask.ext.login import LoginManager
+from flask.ext.openid import OpenID
+from config import basedir
+import flask.ext.restless 
 
-# Import Python Modules
-import time, os
+# Import Additional Python Modules
+import os, time, datetime
 import yaml
 import datetime
 import RPi.GPIO as GPIO
@@ -14,19 +16,27 @@ import signal
 import sys
 from pushbullet import Pushbullet
 
-# Import custom functions used in this application
-from pid import pidpy as PIDController
-from gpioFunctions import *
-from dbFunctions import *
-from configFunctions import *
-from notificationFunctions import *
-
-### Configuration ###
-
-# Set-up Flask Application Settings
+# Set-up Flask Application
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://brewPi:brewPi@localhost/brewPi'
+app.config.from_object('config')
+#from core import db
+#db = SQLAlchemy(app)
 db = SQLAlchemy(app)
+#db.init_app(app)
+lm = LoginManager()
+lm.init_app(app)
+lm.login_view = 'login'
+oid = OpenID(app, os.path.join(basedir, 'tmp'))
+
+# Import Models
+from app.models import *
+
+# Import custom functions used in this application
+from app.mod_pid import pidpy as PIDController
+from app.mod_gpio import *
+#from app.dbFunctions import *
+from app.mod_config import *
+from app.mod_notify import *
 
 # Set handler for SIGINT (Ctrl-C)
 signal.signal(signal.SIGINT, signal_handler)
@@ -47,12 +57,8 @@ sensors = loadSensorConfig(config)
 # Initialize GPIO
 initializeGPIO(config)
 
-### Define Data Model ###
-
-# Moved tp app/models.py
-
 # Create the database tables.
-db.create_all()
+#db.create_all()
 
 ### Flask-Restless API ###
 

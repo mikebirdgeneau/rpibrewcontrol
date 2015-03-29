@@ -22,6 +22,10 @@ sudo pip install pushbullet.py
 sudo pip install simplejson
 sudo pip install python-mysqldb
 sudo pip install awscli
+sudo pip install sqlalchemy-migrate
+sudo pip install flask
+sudo pip install flask-openlogin
+sudo pip install sqlalchemy
 # AWS CLI used to roll my own Dynamic DNS service
 # Not required!
 # http://willwarren.com/2014/07/03/roll-dynamic-dns-service-using-amazon-route53/
