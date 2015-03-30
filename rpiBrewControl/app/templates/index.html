@@ -29,38 +29,34 @@
     <script src="static/js/d3.min.js",type="text/javascript"></script>
     <script src="static/js/c3.min.js",type="text/javascript"></script>
     
-    <script type="text/javascript">
-    'use strict';
-        <!--
-            function onTest( dest, params, destDiv )
-            {
-                var xmlhttp;
-
-                if (window.XMLHttpRequest)
-                {// code for IE7+, Firefox, Chrome, Opera, Safari
-                    xmlhttp=new XMLHttpRequest();
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+    
+   <script type="text/javascript">
+      var SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+      (function() {
+        "use strict";
+        $(document).ready(function() {
+            var filters = [{"name": "id", "op": "lte", "val": 5}];
+            $.ajax({
+              url: SCRIPT_ROOT + '/api/sensors',
+              data: {"q": JSON.stringify({"filters": filters})},
+              dataType: 'json',
+              contentType: "application/json",
+              success: function(data) {
+                var all_sensors, new_row, i;
+                all_sensors = data.objects;
+                for (i = 0; i < data.objects.length; ++i) {
+                  new_row = $("<tr><td>" + data.objects[i].id + "</td><td>"
+                              + data.objects[i].name + "</td><td>" 
+                              + data.objects[i].setPoint + "</td></tr>");
+                  $("#sensors-with-y").append(new_row);
                 }
-                else
-                {// code for IE6, IE5
-                    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-                }
-
-                xmlhttp.onreadystatechange=function()
-                {
-                    if (xmlhttp.readyState==4 && xmlhttp.status==200)
-                    {
-                        document.getElementById( destDiv ).innerHTML = xmlhttp.responseText;
-                    }
-                }
-
-                xmlhttp.open("POST",dest,true);
-                xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-                xmlhttp.send( params ); 
-            }
-
-
-        -->
-        </script>
+              }
+            });
+          });
+        }());
+  </script>
 
   </head>
 
@@ -91,7 +87,9 @@
         <div class="row">
             <div class="col-sm-12">
                 <h3>Equipment Summary</h3>
-                <div id="equipSummary"><p> Loading... </p></div>
+                  <table id="sensors-with-y" width="90%">
+                    <tr><th>ID</th><th>Name</th><th>Set Point (C)</th></tr>
+                  </table>
             </div>
         </div>
       
@@ -103,11 +101,11 @@
         <div id="tempTrends"> Loading... </div>
         <div id="chart1"></div>
         <script>
-        var chart = c3.generate({
+        /*var chart = c3.generate({
             bindto: '#chart1',
             data: {
                 x: 'time',
-                url: '/cgi/brewmaster.py?func=tempTrends&sensnum=0',
+                url: '/api/readings',
                 x_format: '%Y-%m-%d %H:%M:%S',
                 //url: 'json/test.json',
                 mimeType: 'json',
@@ -121,28 +119,21 @@
                 }
             }
         });
-            
+            */
         </script>
       </div>
 
     </div><!-- /.container -->
 
     <script>
-        function refreshSummary() {
-        onTest('/cgi/brewmaster.py?func=equipSummary', '', 'equipSummary');
-	}
-	function refreshTempTrends(sensnum) {        
-	    onTest('/cgi/brewmaster.py?func=tempTrends&sensnum='+sensnum, '', 'tempTrends');
-        }
 
-        setInterval(refreshSummary, 8000);
-        setInterval(function(){refreshTempTrends(0)}, 15000);
+        //setInterval(refreshSummary, 8000);
+        //setInterval(function(){refreshTempTrends(0)}, 15000);
     </script>
     
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
+
   </body>
 </html>

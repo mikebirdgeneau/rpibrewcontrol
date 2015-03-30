@@ -3,7 +3,9 @@ from flask import Flask, render_template
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from flask.ext.openid import OpenID
-import flask.ext.restless 
+import flask.ext.restless
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 from config import basedir
 
@@ -75,7 +77,7 @@ manager = flask.ext.restless.APIManager(app, flask_sqlalchemy_db=db)
 
 # Create API endpoints, which will be available at /api/<tablename> by
 # default. Allowed HTTP methods can be specified as well.
-manager.create_api(Sensor, methods=['GET', 'POST', 'PATCH'],max_results_per_page=100,collection_name='sensors', exclude_columns=['readings'])
+manager.create_api(Sensor, methods=['GET', 'POST', 'PATCH'],max_results_per_page=20,collection_name='sensors', exclude_columns=['readings','setpoints'])
 manager.create_api(Reading, methods=['GET', 'POST'],max_results_per_page=100,collection_name='readings')
 manager.create_api(Setpoint, methods=['GET', 'POST', 'DELETE'],max_results_per_page=100,collection_name='setpoints')
 
@@ -156,9 +158,16 @@ def tempControlProc(sensor, proc):
         
         if(readyPIDcalc & readytemp):
             thisReading = Reading(sensor.id, temp_C, sensor.set_point, sensor.duty_cycle, sensor.heaterMode)
-            db.session.add(thisReading)
-            db.session.commit()
+            db_session.add(thisReading)
+            db_session.commit()
+            db_session.close()
             #print "Writing to DB."
+
+# Set up second session for writing to the DB (to avoid errors!)
+engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+db_session = scoped_session(sessionmaker(autocommit=False,
+                                     autoflush=False,
+                                     bind=engine))
 
 
 db.create_all()
@@ -186,6 +195,7 @@ def initialize():
             pidTi = sensor.Ti, pidTd = sensor.Td, Ts = sensor.cycle_time,
             smoothPts = sensor.smoothPts, updated = datetime.datetime.utcnow()))
             db.session.commit()
+            db.session.close()
         else:
             # Create new sensor:
             thisSensor = Sensor(sensor.id, sensor.name, sensor.heatPin, 
@@ -194,6 +204,8 @@ def initialize():
             sensor.Ti, sensor.Td, sensor.cycle_time, sensor.smoothPts, datetime.datetime.utcnow())
             db.session.add(thisSensor)
             db.session.commit()
+            db.session.close()
+
         parent_conn, child_conn = Pipe()     
         p = Process(name = "tempControlProc", target=tempControlProc, args=(sensor,child_conn))
         p.start()
