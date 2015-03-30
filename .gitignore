@@ -3,3 +3,4 @@ secrets.yml
 *.db
 *-journal
 config.py
+rpibrewcontrol/env/
