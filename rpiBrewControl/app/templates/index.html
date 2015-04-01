@@ -137,40 +137,37 @@
       
       <div class="well">
         <div id="tempTrends"></div>
-        <div id="chart1"></div>
+        <div id="chart1">Loading Chart Data...</div>
         <script>
         
-        tempTrendChart = function(sensorID){
-            //var d = new Date();
-            //var localOffset = d.getTimezoneOffset() * 60000;
-            //var timeFilter = new Date().getTime() - 60*60*1000 + localOffset;
-            var filters = [{"name": "sensor_id", "op": "==", "val": sensorID}]; // $.format.date(localTime,"MMM d H:mm:ss")
-            var order = [{"field": "time", "direction": "desc"}];
-            $.ajax({
-                url: 'http://ceres.mikebirdgeneau.com/api/readings',
-                data: {"q": JSON.stringify({"filters": filters, "order_by": order, "limit": 300, "results_per_page": 50})},
+        var chart;
+        var chartData;
+    
+        initializeTempTrendChart = function(sensorID){
+        // Get initial chart data:
+        var filters = [{"name": "sensor_id", "op": "==", "val": sensorID}]; // $.format.date(localTime,"MMM d H:mm:ss")
+        var order = [{"field": "id", "direction": "desc"}];
+        $.ajax({
+                url: '/api/readings?results_per_page=1800',
+                data: {"q": JSON.stringify({"results_per_page":1800,"filters": filters, "order_by": order,"limit":300})},
                 dataType: "json",
                 contentType: "application/json",
+
                 success: function(data) {
                     // Format Data for Chart
                     var myTimes = [], myReadings = [], mySetPoints = [];
                     for (i = 0; i < data.objects.length; ++i) {
-                        var d = new Date();
+                    //var i = 1;
+                    var d = new Date();
                         var time = new Date(data.objects[i].time);
                         var localOffset = d.getTimezoneOffset() * 60000;
                         var localTime =  $.format.date(time + localOffset,"yyyy-MM-dd HH:mm:ss");
                         myTimes.push(localTime)
                         myReadings.push(parseFloat(data.objects[i].tempC).toFixed(2))
                     }
-                    var chartData = {"time": myTimes, "tempC": myReadings}
-                    // Debugging Output
-                    //console.log(data.objects);
-                    //console.log(myTimes);
-                    //console.log(myReadings);
-                    console.log(chartData);
-
+                    chartData = {"time": myTimes, "tempC": myReadings}
                     // Create and Bind Chart
-                    var chart = c3.generate({
+                    chart = c3.generate({
                         bindto: '#chart1',
                         data: {
                             json: chartData,
@@ -179,19 +176,58 @@
                         },
                         axis: {
                             x: {
-                                label: "Time",
-                                type: 'timeseries',
-                                tick: {
-                                    format: '%m-%d %H:%M'
+                            label: "Time",
+                            type: 'timeseries',
+                            tick: {
+                                format: '%m-%d %H:%M:%S',
+                                count: 4
                                 }
                             },
                             y: {
                                 label: 'Temperature (C)',
                                 tick: {
-                                    format: function(y){d3.round(y,2)}
+                                    format: function (y) { return y.toFixed(1); }
                                 }
+                                //format: function(y){y.toFixed(2)}
                             }
                         }
+                    });
+                }
+        });
+        }
+        
+        initializeTempTrendChart("28-00043eb791ff");
+        //console.log(chartData);
+        console.log("Setting up Chart...")
+        
+        
+        tempTrendChart = function(sensorID){
+            var filters = [{"name": "sensor_id", "op": "==", "val": sensorID}]; // $.format.date(localTime,"MMM d H:mm:ss")
+            var order = [{"field": "id", "direction": "desc"}];
+            $.ajax({
+                url: '/api/readings',
+                data: {"q": JSON.stringify({"filters": filters, "order_by": order,"limit":1})},
+                dataType: "json",
+                contentType: "application/json",
+
+                success: function(data) {
+                    // Format Data for Chart
+                    var myTimes = [], myReadings = [], mySetPoints = [];
+                    for (i = 0; i < data.objects.length; ++i) {
+                    //var i = 0;
+                    var d = new Date();
+                        var time = new Date(data.objects[i].time);
+                        var localOffset = d.getTimezoneOffset() * 60000;
+                        var localTime =  $.format.date(time + localOffset,"yyyy-MM-dd HH:mm:ss");
+                        myTimes.push(localTime)
+                        myReadings.push(parseFloat(data.objects[i].tempC).toFixed(2))
+                    }
+                    var chartData = {"time": myTimes, "tempC": myReadings}
+                    // Debugging Output
+                    console.log(chartData);
+                    chart.flow({
+                        json: chartData,
+                        length: 0
                     });
                 }});
         }
@@ -204,8 +240,8 @@
     <script>
 
         //setInterval(refreshSummary, 8000);
-        setInterval(function(){tempTrendChart("28-00043eb791ff")},10000);
-        setInterval(function(){loadEquipmentSummary()}, 2500);
+        setInterval(function(){tempTrendChart("28-00043eb791ff")},5000);
+        setInterval(function(){loadEquipmentSummary()}, 5000);
     </script>
     
     <!-- Bootstrap core JavaScript
