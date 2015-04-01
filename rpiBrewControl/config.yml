@@ -13,7 +13,7 @@ sensors:
     - id:               28-00043eb791ff
       name:             MLT
       heatPin:          17
-      heaterMode:       0
+      heaterMode:       1
       sensorEnabled:    0
       defaultSetpoint:  22.0
       dutyCycle:        0.0

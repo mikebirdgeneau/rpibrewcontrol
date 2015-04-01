@@ -30,6 +30,8 @@
     <script src="static/js/c3.min.js",type="text/javascript"></script>
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="static/js/jquery-dateFormat.min.js",type="text/javascript"></script>
+
     <script src="static/js/bootstrap.min.js"></script>
     
     <script type="text/javascript">
@@ -45,9 +47,10 @@
             success: function(data) {
                 var all_sensors, new_row, i;
                 all_sensors = data.objects;
-                $("#sensorList tr").remove();
+                $("#sensorList thead").remove();
+                $("#sensorList tbody").remove();
                 
-                new_row = $("<tr><th>Name</th><th>Sensor ID</th><th>Temp (C)</th><th>Set Point (C)</th><th>Status</th></tr>");
+                new_row = $("<thead><tr><th>Name</th><th>Sensor ID</th><th>Temp (C)</th><th>Setting (C)</th><th>Duty</th><th>Status</th><th>Updated</th></tr></thead><tbody>");
                 $("#sensorList").append(new_row);
                 
                 for (i = 0; i < data.objects.length; ++i) {
@@ -67,13 +70,22 @@
                             heaterMode = "Off";
                     }
                     
-                    new_row = $("<tr><td>" + data.objects[i].name + "</td><td>"
-                              + data.objects[i].sensor_id + "</td><td>"
-                              + TempC + "</td><td>"
-                              + data.objects[i].setPoint + "</td><td>"
-                              + heaterMode + "</td></tr>");
+                    var d = new Date();
+                    var updated = new Date(data.objects[i].updated);
+                    var localOffset = d.getTimezoneOffset() * 60000;
+                    var localTime =  updated + localOffset;
+                    
+                    new_row = $("<tr id='"+data.objects[i].sensor_id+"'><td><strong>" + data.objects[i].name + "</strong></td><td><small>"
+                              + data.objects[i].sensor_id + "</small></td><td>"
+                              + parseFloat(TempC).toFixed(2) + "</td><td>"
+                              + parseFloat(data.objects[i].setPoint).toFixed(2) + "</td><td>"
+                              + parseFloat(data.objects[i].dutyCycle).toFixed(0) + "%</td><td>"
+                              + heaterMode  + "</td><td>"
+                              + $.format.date(localTime,"MMM d H:mm:ss") + "</td></tr>");
                     $("#sensorList").append(new_row);
                 }
+                new_row = $("</tbody>");
+                $("#sensorList").append(new_row);
             }
         });
     };
@@ -111,9 +123,11 @@
         <div class="row">
             <div class="col-sm-12">
                 <h3>Equipment Summary</h3>
-                  <table id="sensorList" width="90%" class="table table-striped">
-
+                <div class="table-responsive">
+                  <table id="sensorList" width="90%" class="table table-condensed table-hover">
+                  <tr><td>Loading...</td></tr>
                   </table>
+                </div>
             </div>
         </div>
       
@@ -122,28 +136,66 @@
       </div>
       
       <div class="well">
-        <div id="tempTrends"> Loading... </div>
+        <div id="tempTrends"></div>
         <div id="chart1"></div>
         <script>
-        /*var chart = c3.generate({
-            bindto: '#chart1',
-            data: {
-                x: 'time',
-                url: '/api/readings',
-                x_format: '%Y-%m-%d %H:%M:%S',
-                //url: 'json/test.json',
-                mimeType: 'json',
-            },
-            axis: {
-                x: {
-                    type: 'timeseries',
-                    tick: {
-                        format: '%Y-%m-%d'
+        
+        tempTrendChart = function(sensorID){
+            //var d = new Date();
+            //var localOffset = d.getTimezoneOffset() * 60000;
+            //var timeFilter = new Date().getTime() - 60*60*1000 + localOffset;
+            var filters = [{"name": "sensor_id", "op": "==", "val": sensorID}]; // $.format.date(localTime,"MMM d H:mm:ss")
+            var order = [{"field": "time", "direction": "desc"}];
+            $.ajax({
+                url: 'http://ceres.mikebirdgeneau.com/api/readings',
+                data: {"q": JSON.stringify({"filters": filters, "order_by": order, "limit": 300, "results_per_page": 50})},
+                dataType: "json",
+                contentType: "application/json",
+                success: function(data) {
+                    // Format Data for Chart
+                    var myTimes = [], myReadings = [], mySetPoints = [];
+                    for (i = 0; i < data.objects.length; ++i) {
+                        var d = new Date();
+                        var time = new Date(data.objects[i].time);
+                        var localOffset = d.getTimezoneOffset() * 60000;
+                        var localTime =  $.format.date(time + localOffset,"yyyy-MM-dd HH:mm:ss");
+                        myTimes.push(localTime)
+                        myReadings.push(parseFloat(data.objects[i].tempC).toFixed(2))
                     }
-                }
-            }
-        });
-            */
+                    var chartData = {"time": myTimes, "tempC": myReadings}
+                    // Debugging Output
+                    //console.log(data.objects);
+                    //console.log(myTimes);
+                    //console.log(myReadings);
+                    console.log(chartData);
+
+                    // Create and Bind Chart
+                    var chart = c3.generate({
+                        bindto: '#chart1',
+                        data: {
+                            json: chartData,
+                            x: 'time',
+                            xFormat: '%Y-%m-%d %H:%M:%S'
+                        },
+                        axis: {
+                            x: {
+                                label: "Time",
+                                type: 'timeseries',
+                                tick: {
+                                    format: '%m-%d %H:%M'
+                                }
+                            },
+                            y: {
+                                label: 'Temperature (C)',
+                                tick: {
+                                    format: function(y){d3.round(y,2)}
+                                }
+                            }
+                        }
+                    });
+                }});
+        }
+
         </script>
       </div>
 
@@ -152,7 +204,8 @@
     <script>
 
         //setInterval(refreshSummary, 8000);
-        setInterval(function(){loadEquipmentSummary()}, 2000);
+        setInterval(function(){tempTrendChart("28-00043eb791ff")},10000);
+        setInterval(function(){loadEquipmentSummary()}, 2500);
     </script>
     
     <!-- Bootstrap core JavaScript

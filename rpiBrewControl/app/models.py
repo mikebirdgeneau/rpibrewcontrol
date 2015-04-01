@@ -22,6 +22,7 @@ class Sensor(db.Model):
     updated = db.Column(db.DateTime(False))
     readings = db.relationship('Reading', backref='sensor', lazy='dynamic')
     setpoints = db.relationship('Setpoint', backref='sensor', lazy='dynamic')
+    tempC = db.Column(db.Numeric(6,3))
 
     
     def __init__(self, sensor_id, name, heatPin, heaterMode, sensorEnabled, setPoint, 
