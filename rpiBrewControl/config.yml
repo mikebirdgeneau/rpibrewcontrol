@@ -25,6 +25,7 @@ sensors:
       Ti:               165
       Td:               4.0
       Ts:               2.0
+      record_freq:      10.0
       smoothPts:        5
     
     - id:               28-00043eb000ff
@@ -42,6 +43,7 @@ sensors:
       Ti:               165
       Td:               4.0
       Ts:               2.0
+      record_freq:      10.0
       smoothPts:        5
 
 extraGPIO:

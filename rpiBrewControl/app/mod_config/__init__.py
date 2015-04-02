@@ -4,7 +4,7 @@ class sensorSettings:
     def __init__(self, id = "28-xxxxxxxxxxxx", name = "Vessel", heatPin = 99,
     heaterMode = 0, sensorEnabled = 0, set_point = 0.0, alarmLL = -0.1, 
     alarmHH = 100.0, alarmL = -0.1, alarmH = 100.0, Kc = 44, Ti = 165, Td = 4.0, 
-    Ts = 5.0, smoothPts = 5):
+    Ts = 5.0, smoothPts = 5, record_freq = 10.0):
         self.id = id
         self.name = name
         self.heatPin = heatPin
@@ -21,6 +21,7 @@ class sensorSettings:
         self.Ti = Ti
         self.Td = Td
         self.cycle_time = Ts
+        self.record_freq = record_freq
         self.smoothPts = smoothPts
         self.elapsed = 0.5
         
@@ -34,7 +35,7 @@ def loadSensorConfig(config):
             sensorEnabled = sensor['sensorEnabled'],
             set_point = sensor['defaultSetpoint'],alarmLL = sensor['alarmLL'], 
             alarmHH = sensor['alarmHH'],Kc = sensor['Kc'],Ti = sensor['Ti'],
-            Td = sensor['Td'], Ts = sensor['Ts'], 
+            Td = sensor['Td'], Ts = sensor['Ts'], record_freq = sensor['record_freq'],
             smoothPts = sensor['smoothPts'])
         sensors.append(thisSensor)
     return(sensors)

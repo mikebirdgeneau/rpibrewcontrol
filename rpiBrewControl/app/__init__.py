@@ -85,7 +85,7 @@ manager.create_api(Setpoint, methods=['GET', 'POST', 'DELETE'],max_results_per_p
 
 # Main Temperature Control Process
 def tempControlProc(sensor, proc):
-    
+        
     #Pipe to communicate with "Get Temperature Process"
     parent_conn_temp, child_conn_temp = Pipe()       
     ptemp = Process(name = "gettempProc", target=gettempProc, args=(child_conn_temp, sensor))
@@ -98,10 +98,13 @@ def tempControlProc(sensor, proc):
     pheat.daemon = True
     pheat.start() 
     
+    # Setup variables for loop:
     temp_ma_list = []
     temp_ma = 0.0
-    
     readyPIDcalc = False
+    
+    timeFromLastRecord = 0.0
+    
     while (True):
     # Temperature Poll
         readytemp = False
@@ -157,19 +160,21 @@ def tempControlProc(sensor, proc):
         readyPIDcalc = True
         
         if(readyPIDcalc & readytemp):
-            thisReading = Reading(sensor.id, temp_C, sensor.set_point, sensor.duty_cycle, sensor.heaterMode)
-            db_session.add(thisReading)
-            db_session.commit()
-            db_session.close()
             
-            # Update temperature
-            #thisSensor = Sensor.query.filter_by(sensor_id=sensor.id)
-            #thisSensor.update(dict(tempC = temp_C))
+            # Save Temperature to DB if interval record_freq is reached (avoid storing too often!)
+            timeFromLastRecord = timeFromLastRecord + float(elapsed)
+            if(timeFromLastRecord>=float(sensor.record_freq)):
+                timeFromLastRecord = 0.0
+                thisReading = Reading(sensor.id, temp_C, sensor.set_point, sensor.duty_cycle, sensor.heaterMode)
+                db_session.add(thisReading)
+                db_session.commit()
+                db_session.close()
+
+            # Update Sensor Record in DB
             db_session.query(Sensor).filter(Sensor.sensor_id==sensor.id).update({Sensor.tempC: temp_C, Sensor.dutyCycle: sensor.duty_cycle, Sensor.updated: datetime.datetime.utcnow()})
-            #Sensor.query.filter_by(sensor_id=sensor.id).update(dict(tempC = temp_C))
             db_session.commit()
             db_session.close()
-            #print "Writing to DB."
+
 
 # Set up second session for writing to the DB (to avoid errors!)
 engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
