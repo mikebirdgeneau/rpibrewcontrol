@@ -155,7 +155,7 @@
 
                 success: function(data) {
                     // Format Data for Chart
-                    var myTimes = [], myReadings = [], mySetPoints = [];
+                    var myTimes = [], myReadings = [], mySetPoints = [], myDuty = [];
                     for (i = 0; i < data.objects.length; ++i) {
                     //var i = 1;
                     var d = new Date();
@@ -164,15 +164,27 @@
                         var localTime =  $.format.date(time + localOffset,"yyyy-MM-dd HH:mm:ss");
                         myTimes.push(localTime)
                         myReadings.push(parseFloat(data.objects[i].tempC).toFixed(2))
+                        mySetPoints.push(parseFloat(data.objects[i].setPoint).toFixed(2))
+                        myDuty.push(parseFloat(data.objects[i].dutyCycle).toFixed(2))
+
                     }
-                    chartData = {"time": myTimes, "tempC": myReadings}
+                    chartData = {"time": myTimes, "tempC": myReadings, "setPoint": mySetPoints, "duty": myDuty}
                     // Create and Bind Chart
                     chart = c3.generate({
                         bindto: '#chart1',
                         data: {
                             json: chartData,
                             x: 'time',
-                            xFormat: '%Y-%m-%d %H:%M:%S'
+                            xFormat: '%Y-%m-%d %H:%M:%S',
+                            types: {
+                                time: 'area-spline',
+                                //duty: 'line-spline'
+                            },
+                            axes: {
+                                tempC: 'y',
+                                setPoint: 'y',
+                                duty: 'y2'
+                            }
                         },
                         axis: {
                             x: {
@@ -188,10 +200,12 @@
                                 tick: {
                                     format: function (y) { return y.toFixed(1); }
                                 }
-                                //format: function(y){y.toFixed(2)}
+                            },
+                            y2: {
+                                show: true
+                                }
                             }
-                        }
-                    });
+                        });
                 }
         });
         }
@@ -212,7 +226,7 @@
 
                 success: function(data) {
                     // Format Data for Chart
-                    var myTimes = [], myReadings = [], mySetPoints = [];
+                    var myTimes = [], myReadings = [], mySetPoints = [], myDuty = [];
                     for (i = 0; i < data.objects.length; ++i) {
                     //var i = 0;
                     var d = new Date();
@@ -221,8 +235,10 @@
                         var localTime =  $.format.date(time + localOffset,"yyyy-MM-dd HH:mm:ss");
                         myTimes.push(localTime)
                         myReadings.push(parseFloat(data.objects[i].tempC).toFixed(2))
+                        mySetPoints.push(parseFloat(data.objects[i].setPoint).toFixed(2))
+                        myDuty.push(parseFloat(data.objects[i].dutyCycle).toFixed(2))
                     }
-                    var chartData = {"time": myTimes, "tempC": myReadings}
+                    var chartData = {"time": myTimes, "tempC": myReadings, "setPoint": mySetPoints, "duty": myDuty}
                     // Debugging Output
                     console.log(chartData);
                     chart.flow({
