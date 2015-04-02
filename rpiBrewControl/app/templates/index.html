@@ -177,8 +177,9 @@
                             x: 'time',
                             xFormat: '%Y-%m-%d %H:%M:%S',
                             types: {
-                                time: 'area-spline',
-                                //duty: 'line-spline'
+                                tempC: 'area-spline',
+                                setPoint: 'line',
+                                duty: 'line'
                             },
                             axes: {
                                 tempC: 'y',
@@ -188,22 +189,37 @@
                         },
                         axis: {
                             x: {
-                            label: "Time",
-                            type: 'timeseries',
+                            type: 'timeseries',                           
                             tick: {
                                 format: '%m-%d %H:%M:%S',
                                 count: 4
                                 }
                             },
                             y: {
-                                label: 'Temperature (C)',
+                                label: {
+                                    text: 'Temperature (C)',
+                                    position: 'outer-middle'
+                                },
                                 tick: {
                                     format: function (y) { return y.toFixed(1); }
                                 }
                             },
                             y2: {
+                                min: 0,
+                                max: 100,
+                                padding: {top:0, bottom:0},
+                                label: {
+                                    text: 'Duty (%)',
+                                    position: 'outer-middle'
+                                },
                                 show: true
                                 }
+                            },
+                            point: {
+                                show: false
+                            },
+                            area: {
+                                zerobased: false
                             }
                         });
                 }
