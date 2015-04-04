@@ -37,6 +37,34 @@
     <script type="text/javascript">
     "use strict";
     var SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    
+    function getSensorList(){
+         var filters = [{"name": "id", "op": "lte", "val": 5}];
+        $.ajax({
+            url: SCRIPT_ROOT + '/api/sensors',
+            data: {"q": JSON.stringify({"filters": filters})},
+            dataType: 'json',
+            contentType: "application/json",
+            success: function(data) {
+                var all_sensors, new_option, i;
+                all_sensors = data.objects;
+                for (i = 0; i < data.objects.length; ++i)
+                {
+                    var thisSensor = data.objects[i];
+                    //var newOption = $("<option value="+thisSensor.id+">"+thisSensor.name+"</option>");
+                    //$("#selectTempPlotSensor").add(newOption);
+                    
+                    var x = document.getElementById("selectTempPlotSensor");
+                    var option = document.createElement("option");
+                    option.text = thisSensor.name + " ("+ thisSensor.sensor_id +")";
+                    option.value = thisSensor.id;
+                    x.add(option);
+                    
+                }
+            }
+        })
+    }
+    
     function loadEquipmentSummary() {
         var filters = [{"name": "id", "op": "lte", "val": 5}];
         $.ajax({
@@ -90,7 +118,9 @@
         });
     };
     $(document).ready(function() {
-        loadEquipmentSummary()
+        loadEquipmentSummary();
+        getSensorList();
+        
     });
     </script>
 
@@ -132,7 +162,18 @@
         </div>
       
       <div class="">
-        <h3>Temperature Trends</h3>
+        <h3>Temperature Trends & Control</h3>
+      </div>
+      
+      <div>
+          <form>
+              <div class="form-group">
+              <label for="selectTempPlotSensor">Select Equipment:</label>
+            <select class="form-control" id="selectTempPlotSensor">
+                
+            </select>
+            </div>
+          </form>
       </div>
       
       <div class="well">
@@ -177,7 +218,7 @@
                             x: 'time',
                             xFormat: '%Y-%m-%d %H:%M:%S',
                             types: {
-                                tempC: 'area-spline',
+                                tempC: 'area',
                                 setPoint: 'line',
                                 duty: 'line'
                             },
@@ -273,7 +314,6 @@
     </div><!-- /.container -->
 
     <script>
-
         //setInterval(refreshSummary, 8000);
         setInterval(function(){tempTrendChart("28-00043eb791ff")},5000);
         setInterval(function(){loadEquipmentSummary()}, 5000);
