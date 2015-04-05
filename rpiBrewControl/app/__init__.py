@@ -161,6 +161,10 @@ def tempControlProc(sensor, proc):
         
         if(readyPIDcalc & readytemp):
             
+            # Check for updated setpoints in DB
+            checkSensor = db_session.query(Sensor).filter(Sensor.sensor_id==sensor.id).first()
+            sensor.set_point = float(checkSensor.setPoint)
+            
             # Save Temperature to DB if interval record_freq is reached (avoid storing too often!)
             timeFromLastRecord = timeFromLastRecord + float(elapsed)
             if(timeFromLastRecord>=float(sensor.record_freq)):
