@@ -77,7 +77,7 @@ manager = flask.ext.restless.APIManager(app, flask_sqlalchemy_db=db)
 
 # Create API endpoints, which will be available at /api/<tablename> by
 # default. Allowed HTTP methods can be specified as well.
-manager.create_api(Sensor, methods=['GET', 'POST', 'PATCH'],max_results_per_page=20,collection_name='sensors', exclude_columns=['readings','setpoints'])
+manager.create_api(Sensor, methods=['GET', 'POST', 'PATCH'],max_results_per_page=20,collection_name='sensors', exclude_columns=['readings','setpoints'],allow_patch_many=True,primary_key='sensor_id')
 manager.create_api(Reading, methods=['GET', 'POST'],max_results_per_page=3600,collection_name='readings', exclude_columns=['sensor'])
 manager.create_api(Setpoint, methods=['GET', 'POST', 'DELETE'],max_results_per_page=100,collection_name='setpoints',exclude_columns=['sensor'])
 

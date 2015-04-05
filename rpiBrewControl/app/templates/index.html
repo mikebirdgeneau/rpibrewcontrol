@@ -35,116 +35,31 @@
     <script src="static/js/bootstrap.min.js"></script>
     
     <script type="text/javascript">
-    "use strict";
-    var SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-    
-    function getSensorList(){
-         var filters = [{"name": "id", "op": "lte", "val": 5}];
-        $.ajax({
-            url: SCRIPT_ROOT + '/api/sensors',
-            data: {"q": JSON.stringify({"filters": filters})},
-            dataType: 'json',
-            contentType: "application/json",
-            success: function(data) {
-                var all_sensors, new_option, i;
-                all_sensors = data.objects;
-                for (i = 0; i < data.objects.length; ++i)
-                {
-                    var thisSensor = data.objects[i];
-                    //var newOption = $("<option value="+thisSensor.id+">"+thisSensor.name+"</option>");
-                    //$("#selectTempPlotSensor").add(newOption);
-                    
-                    var x = document.getElementById("selectTempPlotSensor");
-                    var option = document.createElement("option");
-                    option.text = thisSensor.name + " ("+ thisSensor.sensor_id +")";
-                    option.value = thisSensor.id;
-                    x.add(option);
-                    
-                }
-            }
-        })
-    }
-    
-    function loadEquipmentSummary() {
-        var filters = [{"name": "id", "op": "lte", "val": 5}];
-        $.ajax({
-            url: SCRIPT_ROOT + '/api/sensors',
-            data: {"q": JSON.stringify({"filters": filters})},
-            dataType: 'json',
-            contentType: "application/json",
-            success: function(data) {
-                var all_sensors, new_row, i;
-                all_sensors = data.objects;
-                $("#sensorList thead").remove();
-                $("#sensorList tbody").remove();
-                
-                new_row = $("<thead><tr><th>Name</th><th>Sensor ID</th><th>Temp (C)</th><th>Setting (C)</th><th>Duty</th><th>Status</th><th>Updated</th></tr></thead><tbody>");
-                $("#sensorList").append(new_row);
-                
-                for (i = 0; i < data.objects.length; ++i) {
-                    var TempC = data.objects[i].tempC
-                    if (typeof TempC == 'undefined'){
-                        TempC = "-";
-                    }
-                    var heaterMode; 
-                    switch(data.objects[i].heaterMode) {
-                        case 1:
-                            heaterMode = "Auto";
-                            break;
-                        case 2:
-                            heaterMode = "Manual";
-                            break;
-                        default:
-                            heaterMode = "Off";
-                    }
-                    
-                    var d = new Date();
-                    var updated = new Date(data.objects[i].updated);
-                    var localOffset = d.getTimezoneOffset() * 60000;
-                    var localTime =  updated + localOffset;
-                    
-                    new_row = $("<tr id='"+data.objects[i].sensor_id+"'><td><strong>" + data.objects[i].name + "</strong></td><td><small>"
-                              + data.objects[i].sensor_id + "</small></td><td>"
-                              + parseFloat(TempC).toFixed(2) + "</td><td>"
-                              + parseFloat(data.objects[i].setPoint).toFixed(2) + "</td><td>"
-                              + parseFloat(data.objects[i].dutyCycle).toFixed(0) + "%</td><td>"
-                              + heaterMode  + "</td><td>"
-                              + $.format.date(localTime,"MMM d H:mm:ss") + "</td></tr>");
-                    $("#sensorList").append(new_row);
-                }
-                new_row = $("</tbody>");
-                $("#sensorList").append(new_row);
-            }
-        });
-    };
-    $(document).ready(function() {
-        loadEquipmentSummary();
-        getSensorList();
-        
-    });
+        "use strict";
+        var SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     </script>
 
   </head>
 
   <body>
 
-    <nav class="navbar navbar-inverse navbar-fixed-top">
+    <nav class="navbar navbar-inverse">
       <div class="container">
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <!--<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
-          </button>
+          </button>-->
           <a class="navbar-brand" href="#">Brewhouse Control</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
+          <!--<ul class="nav navbar-nav">
             <li class="active"><a href="#">Overview</a></li>
             <li><a href="#temperatures">Temperatures</a></li>
+            -->
           </ul>
-        </div><!--/.nav-collapse -->
       </div>
     </nav>
 
@@ -165,24 +80,76 @@
         <h3>Temperature Trends & Control</h3>
       </div>
       
-      <div>
+        <div>
           <form>
               <div class="form-group">
               <label for="selectTempPlotSensor">Select Equipment:</label>
-            <select class="form-control" id="selectTempPlotSensor">
-                
+            <select class="form-control" id="selectTempPlotSensor" onchange="onSelectSensorChange(this)">
+                <option value="" disabled selected style="display:none;">Loading...</option>
             </select>
             </div>
           </form>
-      </div>
+        </div>
       
-      <div class="well">
-        <div id="tempTrends"></div>
-        <div id="chart1">Loading Chart Data...</div>
+
+            <ul class="nav nav-tabs" role="tablist" id="myTab">
+              <li role="presentation" class="active"><a href="#trends" aria-controls="trends" role="tab" data-toggle="tab">Trends</a></li>
+              <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
+            </ul>
+            <div class="tab-content">
+              <div role="tabpanel" class="tab-pane active" id="trends">
+                <h4>Temperature Trends</h4>
+                <div class="well well-sm">
+                    <div id="tempTrends"></div>
+                    <div id="chart1">Loading Chart Data...</div>
+                </div>
+              </div>
+              <div role="tabpanel" class="tab-pane" id="settings">
+                <h4>Temperature Control</h4>
+                <div class="well well-sm">
+                    <form class="form" action="javascript:changeSetpoint(this);">
+                     <div class="row">
+                      <div class="col-sm-4">
+                      <div class="radio">
+                        <strong>Setpoint Type:</strong>
+                        <label class="radio">
+                        <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="setCurrent" onclick="handleSetpointRadio(this)" checked> Current Time
+                        </label>
+                        <label class="radio">
+                          <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="setFuture"  onclick="handleSetpointRadio(this)"> Scheduled Time
+                        </label>
+                      </div>
+                      </div>
+                      <br />
+                      <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="inputTimeLabel1">Time</label>
+                        <input type="datetime-local" class="form-control" id="inputSetpointTime1" name="dtl" disabled>
+                      </div>
+                      </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="inputSetpointLabel1">Temperature Setpoint (C):</label>
+                        <!-- TODO: Use HH and LL alarms for limit of setpoint values? -->
+                        <input type="number" class="form-control" id="inputSetpoint1" min=0, max=110, step=0.1>
+                      </div>
+                      <button type="submit" class="btn btn-default btn-primary">Apply Changes</button>
+                    </form>
+                </div>
+              </div>
+        </div>
+
+
+      
+
+      
+
         <script>
-        
+
+        // Javascript to Create & Refresh Trend Charts
         var chart;
         var chartData;
+        var chartRefresh;
     
         initializeTempTrendChart = function(sensorID){
         // Get initial chart data:
@@ -269,12 +236,7 @@
                 }
         });
         }
-        
-        initializeTempTrendChart("28-00043eb791ff");
-        //console.log(chartData);
-        console.log("Setting up Chart...")
-        
-        
+    
         tempTrendChart = function(sensorID){
             var filters = [{"name": "sensor_id", "op": "==", "val": sensorID}]; // $.format.date(localTime,"MMM d H:mm:ss")
             var order = [{"field": "id", "direction": "desc"}];
@@ -307,21 +269,200 @@
                     });
                 }});
         }
+        
+        getCurrentSensorData = function(sensorID){
+            var filters = [{"name": "sensor_id", "op": "==", "val": sensorID}];
+            //var order = [{"field": "id", "direction": "desc"}];
+            $.ajax({
+                url: '/api/sensors',
+                data: {"q": JSON.stringify({"filters": filters, "limit":1})},
+                //data: {"q": JSON.stringify({"filters": filters, "order_by": order,"limit":1})},
+                dataType: "json",
+                contentType: "application/json",
 
-        </script>
-      </div>
+                success: function(data) {
+                    var thisSensor;
+                    thisSensor = data.objects[0];
+                    document.getElementById("inputSetpoint1").value = thisSensor.setPoint.toFixed(1);
+                    document.getElementById("inputSetpoint1").max = thisSensor.alarmHH.toFixed(1);
+                    document.getElementById("inputSetpoint1").min = thisSensor.alarmLL.toFixed(1);
+                      return(data);
+                }
+            });
+        };
+    
+        function setOneNumberDecimal(event) {
+            this.value = parseFloat(this.value).toFixed(1);
+        }
+        document.getElementById("inputSetpoint1").onchange = setOneNumberDecimal;
+
+    
+        function onSelectSensorChange (select) {
+            clearInterval(chartRefresh);
+            var selectedOption = select.options[select.selectedIndex];
+            //alert ("The selected option is " + selectedOption.value);
+            initializeTempTrendChart(selectedOption.value);
+            chartRefresh = setInterval(function(){tempTrendChart(selectedOption.value)},5000);
+            getCurrentSensorData(selectedOption.value);
+        }
+    
+        function getSensorList(){
+         var filters = [{"name": "id", "op": "lte", "val": 5}];
+        $.ajax({
+            url: SCRIPT_ROOT + '/api/sensors',
+            data: {"q": JSON.stringify({"filters": filters})},
+            dataType: 'json',
+            contentType: "application/json",
+            success: function(data) {
+                var all_sensors, new_option, i;
+                all_sensors = data.objects;
+                for (i = 0; i < data.objects.length; ++i)
+                {
+                    var thisSensor = data.objects[i];
+                    //var newOption = $("<option value="+thisSensor.id+">"+thisSensor.name+"</option>");
+                    //$("#selectTempPlotSensor").add(newOption);
+                    
+                    var x = document.getElementById("selectTempPlotSensor");
+                    var option = document.createElement("option");
+                    option.id = thisSensor.sensor_id;
+                    option.text = thisSensor.name + " ("+ thisSensor.sensor_id +")";
+                    option.value = thisSensor.sensor_id;
+                    x.add(option);
+                    if(i==0){
+                        x.value=thisSensor.sensor_id;
+                        onSelectSensorChange(x);
+                    }  
+                }
+            }
+        })
+    }
+    
+        function loadEquipmentSummary() {
+        var filters = [{"name": "id", "op": "lte", "val": 5}];
+        $.ajax({
+            url: SCRIPT_ROOT + '/api/sensors',
+            data: {"q": JSON.stringify({"filters": filters})},
+            dataType: 'json',
+            contentType: "application/json",
+            success: function(data) {
+                var all_sensors, new_row, i;
+                all_sensors = data.objects;
+                $("#sensorList thead").remove();
+                $("#sensorList tbody").remove();
+                
+                new_row = $("<thead><tr><th>Name</th><th>Sensor ID</th><th>Temp (C)</th><th>Setting (C)</th><th>Duty</th><th>Status</th><th>Updated</th></tr></thead><tbody>");
+                $("#sensorList").append(new_row);
+                
+                for (i = 0; i < data.objects.length; ++i) {
+                    var TempC = data.objects[i].tempC
+                    if (typeof TempC == 'undefined'){
+                        TempC = "-";
+                    }
+                    var heaterMode; 
+                    switch(data.objects[i].heaterMode) {
+                        case 1:
+                            heaterMode = "Auto";
+                            break;
+                        case 2:
+                            heaterMode = "Manual";
+                            break;
+                        default:
+                            heaterMode = "Off";
+                    }
+                    
+                    var d = new Date();
+                    var updated = new Date(data.objects[i].updated);
+                    var localOffset = d.getTimezoneOffset() * 60000;
+                    var localTime =  updated + localOffset;
+                    
+                    new_row = $("<tr id='"+data.objects[i].sensor_id+"'><td><strong>" + data.objects[i].name + "</strong></td><td><small>"
+                              + data.objects[i].sensor_id + "</small></td><td>"
+                              + parseFloat(TempC).toFixed(2) + "</td><td>"
+                              + parseFloat(data.objects[i].setPoint).toFixed(2) + "</td><td>"
+                              + parseFloat(data.objects[i].dutyCycle).toFixed(0) + "%</td><td>"
+                              + heaterMode  + "</td><td>"
+                              + $.format.date(localTime,"MMM d H:mm:ss") + "</td></tr>");
+                    $("#sensorList").append(new_row);
+                }
+                new_row = $("</tbody>");
+                $("#sensorList").append(new_row);
+            }
+        });
+    };
+    
+        $.fn.setNow = function (onlyBlank) {
+          var now = new Date($.now())
+            , year
+            , month
+            , date
+            , hours
+            , minutes
+            , seconds
+            , formattedDateTime
+            ;
+        
+          year = now.getFullYear();
+          month = now.getMonth().toString().length === 1 ? '0' + (now.getMonth() + 1).toString() : now.getMonth() + 1;
+          date = now.getDate().toString().length === 1 ? '0' + (now.getDate()).toString() : now.getDate();
+          hours = now.getHours().toString().length === 1 ? '0' + now.getHours().toString() : now.getHours();
+          minutes = now.getMinutes().toString().length === 1 ? '0' + now.getMinutes().toString() : now.getMinutes();
+          seconds = now.getSeconds().toString().length === 1 ? '0' + now.getSeconds().toString() : now.getSeconds();
+        
+          formattedDateTime = year + '-' + month + '-' + date + 'T' + hours + ':' + minutes + ':' + seconds;
+        
+          if ( onlyBlank === true && $(this).val() ) {
+            return this;
+          }
+        
+          $(this).val(formattedDateTime);
+        
+          return this;
+        }
+
+
+        function changeSetpoint(){
+            sensorID = document.getElementById("selectTempPlotSensor").value;
+            setPoint = document.getElementById("inputSetpoint1").value;
+            var patch = JSON.stringify({"setPoint": setPoint});
+            //console.log(setPoint);
+            //console.log(runQuery);
+            $.ajax({
+                url: '/api/sensors/'+sensorID,
+                data: patch,
+                dataType: "json",
+                contentType: "application/json",
+                method: "PATCH",
+                success: function(data) {
+                    //console.log(data.objects[0]);
+                },
+                error: function(xhr, status, error) {
+                  alert(xhr.responseText);
+                }
+            });
+        };
+    
+        function handleSetpointRadio(myRadio) {
+            var currentValue = myRadio.value;
+            if(currentValue == "setCurrent"){
+                $('input[type="datetime-local"]').setNow();
+                document.getElementById("inputSetpointTime1").disabled = true;
+            } else {
+                document.getElementById("inputSetpointTime1").disabled = false;
+            }
+        }
+
+    
+        $(document).ready(function() {
+        loadEquipmentSummary();
+        $('input[type="datetime-local"]').setNow();
+        getSensorList();
+        
+    });
+
+        setInterval(function(){loadEquipmentSummary()}, 5000);
+
+    </script>
 
     </div><!-- /.container -->
-
-    <script>
-        //setInterval(refreshSummary, 8000);
-        setInterval(function(){tempTrendChart("28-00043eb791ff")},5000);
-        setInterval(function(){loadEquipmentSummary()}, 5000);
-    </script>
-    
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-
   </body>
 </html>
