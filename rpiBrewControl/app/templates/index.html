@@ -133,8 +133,9 @@
                         <!-- TODO: Use HH and LL alarms for limit of setpoint values? -->
                         <input type="number" class="form-control" id="inputSetpoint1" min=0, max=110, step=0.1>
                       </div>
-                      <button type="submit" class="btn btn-default btn-primary">Apply Changes</button>
+                      <button id="SetPointSubmitButton" type="submit" class="btn btn-default btn-primary">Apply Setpoint</button>
                     </form>
+                    <div id="setPointChangeSuccess"><p class="bg-success">Setpoint Change Submitted.</p></div>
                 </div>
               </div>
         </div>
@@ -421,11 +422,11 @@
 
 
         function changeSetpoint(){
+            document.getElementById("SetPointSubmitButton").disabled = true;
             sensorID = document.getElementById("selectTempPlotSensor").value;
             setPoint = document.getElementById("inputSetpoint1").value;
             var patch = JSON.stringify({"setPoint": setPoint});
-            //console.log(setPoint);
-            //console.log(runQuery);
+
             $.ajax({
                 url: '/api/sensors/'+sensorID,
                 data: patch,
@@ -433,10 +434,13 @@
                 contentType: "application/json",
                 method: "PATCH",
                 success: function(data) {
-                    //console.log(data.objects[0]);
+                    $("#setPointChangeSuccess").fadeIn( 300 ).delay( 1200 ).fadeOut( 500 );
+                    document.getElementById("SetPointSubmitButton").disabled = false;
                 },
                 error: function(xhr, status, error) {
                   alert(xhr.responseText);
+                  document.getElementById("SetPointSubmitButton").disabled = false;
+
                 }
             });
         };
@@ -455,6 +459,7 @@
         $(document).ready(function() {
         loadEquipmentSummary();
         $('input[type="datetime-local"]').setNow();
+        $("#setPointChangeSuccess").fadeOut(10);
         getSensorList();
         
     });
