@@ -5,7 +5,7 @@ class Sensor(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     sensor_id = db.Column(db.String(16), unique=True)
     name = db.Column(db.String(80))
-    heatPin = db.Column(db.Integer,unique=True)
+    heatPin = db.Column(db.Integer)
     heaterMode = db.Column(db.Integer)
     sensorEnabled = db.Column(db.Integer)
     setPoint = db.Column(db.Numeric(5,2))

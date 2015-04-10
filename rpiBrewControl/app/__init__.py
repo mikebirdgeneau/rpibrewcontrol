@@ -152,7 +152,9 @@ def tempControlProc(sensor, proc):
                     #send to heat process every cycle
                     parent_conn_heat.send([sensor.cycle_time, sensor.duty_cycle])
                     readyPIDcalc = False
-                        
+            else:
+                sensor.duty_cycle = 0
+                
         while parent_conn_heat.poll(): #Poll Heat Process Pipe
                 sensor.cycle_time, sensor.duty_cycle = parent_conn_heat.recv() #non blocking receive from Heat Process ")
    

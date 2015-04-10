@@ -14,7 +14,7 @@ sensors:
       name:             MLT
       heatPin:          17
       heaterMode:       1
-      sensorEnabled:    0
+      sensorEnabled:    1
       defaultSetpoint:  22.0
       dutyCycle:        0.0
       alarmLL:          -0.1
@@ -28,11 +28,11 @@ sensors:
       record_freq:      15.0
       smoothPts:        5
     
-    - id:               28-00043eb000ff
+    - id:               28-00043e923cff
       name:             Kettle
       heatPin:          23
-      heaterMode:       0
-      sensorEnabled:    0
+      heaterMode:       1
+      sensorEnabled:    1
       defaultSetpoint:  0.0
       dutyCycle:        0.0
       alarmLL:          -0.1
