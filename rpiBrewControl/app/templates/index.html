@@ -432,9 +432,14 @@
                 function changeHeaterMode(){
                     document.getElementById("SetHeaterModeButton").disabled = true;
                     sensorID = document.getElementById("selectTempPlotSensor").value;
-                    if (document.getElementById('inputHeaterMode').checked) {
-                        setHeaterMode = document.getElementById("inputHeaterMode").value;
+                    var radios =  document.getElementsByName("inputHeaterMode");
+                    for (var i = 0, length = radios.length; i < length; i++) {
+                        if (radios[i].checked) {
+                            setHeaterMode =  parseInt(radios[i].value,10);
+                            break;
+                        }
                     }
+        
                     var patch = JSON.stringify({"heaterMode": setHeaterMode});
         
                     $.ajax({
