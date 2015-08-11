@@ -10,27 +10,9 @@ usePushbullet: false
 refreshConfig: 5.0
 
 sensors:
-    - id:               28-00043eb791ff
+    - id:               28-00043e9195ff
       name:             MLT
-      heatPin:          17
-      heaterMode:       1
-      sensorEnabled:    1
-      defaultSetpoint:  22.0
-      dutyCycle:        0.0
-      alarmLL:          -0.1
-      alarmHH:          100.0
-      alarmL:           5.0
-      alarmH:           5.0
-      Kc:               44
-      Ti:               165
-      Td:               4.0
-      Ts:               2.0
-      record_freq:      15.0
-      smoothPts:        5
-    
-    - id:               28-00043e923cff
-      name:             Kettle
-      heatPin:          23
+      heatPin:          24
       heaterMode:       1
       sensorEnabled:    1
       defaultSetpoint:  0.0
@@ -42,11 +24,66 @@ sensors:
       Kc:               44
       Ti:               165
       Td:               4.0
-      Ts:               2.0
-      record_freq:      10.0
+      Ts:               5.0
+      record_freq:      30.0
+      smoothPts:        5
+    
+    - id:               28-00043eb7feff
+      name:             Kettle
+      heatPin:          26
+      heaterMode:       1
+      sensorEnabled:    1
+      defaultSetpoint:  0.0
+      dutyCycle:        0.0
+      alarmLL:          -0.1
+      alarmHH:          100.0
+      alarmL:           5.0
+      alarmH:           5.0
+      Kc:               20
+      Ti:               165
+      Td:               4.0
+      Ts:               5.0
+      record_freq:      30.0
       smoothPts:        5
 
+    - id:               28-00043e94c5ff
+      name:             Ferment 1
+      heatPin:          18
+      heaterMode:       1
+      sensorEnabled:    1
+      defaultSetpoint:  10.0
+      dutyCycle:        0.0
+      alarmLL:          -0.1
+      alarmHH:          100.0
+      alarmL:           5.0
+      alarmH:           5.0
+      Kc:               44
+      Ti:               165
+      Td:               4.0
+      Ts:               30.0
+      record_freq:      120.0
+      smoothPts:        5
+    
+    - id:               28-00043eb791ff
+      name:             Ferment 2
+      heatPin:          27
+      heaterMode:       1
+      sensorEnabled:    1
+      defaultSetpoint:  10.0
+      dutyCycle:        0.0
+      alarmLL:          -0.1
+      alarmHH:          100.0
+      alarmL:           5.0
+      alarmH:           5.0
+      Kc:               44
+      Ti:               165
+      Td:               4.0
+      Ts:               30.0
+      record_freq:      120.0
+      smoothPts:        5
+    
 extraGPIO:
-    - name: Pump 1
-      outputPin: 24
-
+    - name: Extra 1
+      outputPin: 22
+    - name: Extra 2
+      outputPin: 23

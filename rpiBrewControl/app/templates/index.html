@@ -73,12 +73,12 @@
           </div>
               <div>
             <form>
-                  <div class="form-group">
+                <div class="form-group">
                 <label for="selectTempPlotSensor">Select Equipment:</label>
                 <select class="form-control" id="selectTempPlotSensor" onchange="onSelectSensorChange(this)">
                       <option value="" disabled selected style="display:none;">Loading...</option>
                     </select>
-              </div>
+                </div>
                 </form>
           </div>
               <ul class="nav nav-tabs" role="tablist" id="myTab">
@@ -88,11 +88,12 @@
               <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="trends">
                   <h4>Temperature Trends</h4>
-                  <div class="well well-sm">
-                <div id="tempTrends"></div>
-                <div id="chart1">Loading Chart Data...</div>
-              </div>
-                </div>
+                  <div id="trendsWell" class="well well-sm">
+                    <div id="tempTrends"></div>
+                    <!--<div id="chartLoad">Loading Chart Data...</div>-->
+                    <div id="chart1"></div>
+                  </div>
+            </div>
             <div role="tabpanel" class="tab-pane" id="settings">
                   <h4>Temperature Control</h4>
                   <div class="well well-sm">
@@ -125,8 +126,23 @@
                   </div>
                       <button id="SetPointSubmitButton" type="submit" class="btn btn-default btn-primary">Apply Setpoint</button>
                     </form>
-                <div id="setPointChangeSuccess">
+                    <form class="form" action="javascript:changeHeaterMode(this);">
+                        <div class="row">
+                        <div class="col-sm-3">
+                        <div class="form-group">
+                              <input type="radio" name="inputHeaterMode" value="0">Off<br/>
+                              <input type="radio" name="inputHeaterMode" value="1">Auto</br>
+                              <input type="radio" name="inputHeaterMode" value="2" disabled>Manual</br>
+                        </div>
+                        </div>
+                        <button id="SetHeaterModeButton" type="submit" class="btn btn-default btn-primary">Set Heater Mode</button>
+                        </div>
+                    </form>
+                    <div id="setPointChangeSuccess">
                       <p class="bg-success">Setpoint Change Submitted.</p>
+                    </div>
+                    <div id="setModeChangeSuccess">
+                      <p class="bg-success">Heater Mode Change Submitted.</p>
                     </div>
               </div>
                 </div>
@@ -252,7 +268,7 @@
                             console.log(chartData);
                             chart.flow({
                                 json: chartData,
-                                length: 0
+                                length: 1
                             });
                         }});
                 }
@@ -294,7 +310,7 @@
                 }
             
                 function getSensorList(){
-                 var filters = [{"name": "id", "op": "lte", "val": 5}];
+                 var filters = [{"name": "id", "op": "lte", "val": 15}];
                 $.ajax({
                     url: SCRIPT_ROOT + '/api/sensors',
                     data: {"q": JSON.stringify({"filters": filters})},
@@ -318,14 +334,21 @@
                             if(i==0){
                                 x.value=thisSensor.sensor_id;
                                 onSelectSensorChange(x);
-                            }  
+                            }
+                            // Add Chart Placeholder...
+                            var xChart = document.getElementById("trendsWell");
+                            var chartHolder = document.createElement("div");
+                            chartHolder.id = "chart_" + thisSensor.sensor_id;
+                            chartHolder.innerHTML = "chart_" + thisSensor.sensor_id;
+                            chartHolder.style.visibility = "hidden";
+                            xChart.appendChild(chartHolder);
                         }
                     }
                 })
             }
             
                 function loadEquipmentSummary() {
-                var filters = [{"name": "id", "op": "lte", "val": 5}];
+                var filters = [{"name": "id", "op": "lte", "val": 20}];
                 $.ajax({
                     url: SCRIPT_ROOT + '/api/sensors',
                     data: {"q": JSON.stringify({"filters": filters})},
@@ -337,7 +360,7 @@
                         $("#sensorList thead").remove();
                         $("#sensorList tbody").remove();
                         
-                        new_row = $("<thead><tr><th>Name</th><th>Sensor ID</th><th>Temp (C)</th><th>Setting (C)</th><th>Duty</th><th>Status</th><th>Updated</th></tr></thead><tbody>");
+                        new_row = $("<thead><tr><th>Name</th><th>Temp (C)</th><th>Setting (C)</th><th>Duty</th><th>Status</th><th>Updated</th><th>Sensor ID</th></tr></thead><tbody>");
                         $("#sensorList").append(new_row);
                         
                         for (i = 0; i < data.objects.length; ++i) {
@@ -362,13 +385,13 @@
                             var localOffset = d.getTimezoneOffset() * 60000;
                             var localTime =  updated + localOffset;
                             
-                            new_row = $("<tr id='"+data.objects[i].sensor_id+"'><td><strong>" + data.objects[i].name + "</strong></td><td><small>"
-                                      + data.objects[i].sensor_id + "</small></td><td>"
-                                      + parseFloat(TempC).toFixed(2) + "</td><td>"
+                            new_row = $("<tr id='"+data.objects[i].sensor_id+"'><td><strong>" + data.objects[i].name + "</strong></td>"
+                                      + "<td>" + parseFloat(TempC).toFixed(2) + "</td><td>"
                                       + parseFloat(data.objects[i].setPoint).toFixed(2) + "</td><td>"
                                       + parseFloat(data.objects[i].dutyCycle).toFixed(0) + "%</td><td>"
                                       + heaterMode  + "</td><td>"
-                                      + $.format.date(localTime,"MMM d H:mm:ss") + "</td></tr>");
+                                      + $.format.date(localTime,"MMM d H:mm:ss") + "</td>"
+                                      +"<td><small>" + data.objects[i].sensor_id + "</small></td></tr>");
                             $("#sensorList").append(new_row);
                         }
                         new_row = $("</tbody>");
@@ -406,6 +429,31 @@
                   return this;
                 }
         
+                function changeHeaterMode(){
+                    document.getElementById("SetHeaterModeButton").disabled = true;
+                    sensorID = document.getElementById("selectTempPlotSensor").value;
+                    if (document.getElementById('inputHeaterMode').checked) {
+                        setHeaterMode = document.getElementById("inputHeaterMode").value;
+                    }
+                    var patch = JSON.stringify({"heaterMode": setHeaterMode});
+        
+                    $.ajax({
+                        url: '/api/sensors/'+sensorID,
+                        data: patch,
+                        dataType: "json",
+                        contentType: "application/json",
+                        method: "PATCH",
+                        success: function(data) {
+                            $("#setModeChangeSuccess").fadeIn( 300 ).delay( 1200 ).fadeOut( 500 );
+                            document.getElementById("SetHeaterModeButton").disabled = false;
+                        },
+                        error: function(xhr, status, error) {
+                          alert(xhr.responseText);
+                          document.getElementById("SetHeaterModeButton").disabled = false;
+        
+                        }
+                    });
+                };
         
                 function changeSetpoint(){
                     document.getElementById("SetPointSubmitButton").disabled = true;
@@ -446,11 +494,12 @@
                 loadEquipmentSummary();
                 $('input[type="datetime-local"]').setNow();
                 $("#setPointChangeSuccess").fadeOut(10);
+                $("#setModeChangeSuccess").fadeOut(10);
                 getSensorList();
                 
             });
         
-                setInterval(function(){loadEquipmentSummary()}, 5000);
+                setInterval(function(){loadEquipmentSummary()}, 10000);
         
             </script> 
             </div>
